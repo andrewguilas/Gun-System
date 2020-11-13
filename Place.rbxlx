@@ -13219,15 +13219,15 @@ function module:showDamageDealt(receiver, damageType, amount)
 	if root then
 		local newIndicator = self.UI.toolUI.DamageIndicator:Clone() do
 			newIndicator.TextLabel.Text = amount
-			newIndicator.TextLabel.TextColor3 = Settings.DamageIndicator[damageType].color
-			newIndicator.TextLabel.TextStrokeTransparency = Settings.DamageIndicator[damageType].stroke
-			newIndicator.TextLabel.TextStrokeColor3 = Settings.DamageIndicator[damageType].strokeColor
+			newIndicator.TextLabel.TextColor3 = Settings.UI.DamageIndicator[damageType].color
+			newIndicator.TextLabel.TextStrokeTransparency = Settings.UI.DamageIndicator[damageType].stroke
+			newIndicator.TextLabel.TextStrokeColor3 = Settings.UI.DamageIndicator[damageType].strokeColor
 			newIndicator.TextLabel.TextTransparency = 1
 			newIndicator.Enabled = true
 			newIndicator.Parent = root 
 			newIndicator.StudsOffset = Vector3.new(
-				math.random(Settings.DamageIndicator.minOffset.X * 10, Settings.DamageIndicator.maxOffset.X * 10) / 10, 
-				math.random(Settings.DamageIndicator.minOffset.Y * 10, Settings.DamageIndicator.maxOffset.Y * 10) / 10, 
+				math.random(Settings.UI.DamageIndicator.minOffset.X * 10, Settings.UI.DamageIndicator.maxOffset.X * 10) / 10, 
+				math.random(Settings.UI.DamageIndicator.minOffset.Y * 10, Settings.UI.DamageIndicator.maxOffset.Y * 10) / 10, 
 				0
 			)
 		end
@@ -13238,9 +13238,9 @@ function module:showDamageDealt(receiver, damageType, amount)
 			playSound(self.sounds.nonheadHitSound, self.tool.handle)
 		end
 
-		Debris:AddItem(newIndicator, Settings.DamageIndicator.maxduration)
-		newTween(newIndicator.TextLabel, Settings.DamageIndicator.tweenInfo, {TextTransparency = 0}).Completed:Wait()
-		newTween(newIndicator.TextLabel, Settings.DamageIndicator.tweenInfo, {TextTransparency = 1})
+		Debris:AddItem(newIndicator, Settings.UI.DamageIndicator.maxduration)
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 0}).Completed:Wait()
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 1})
 	end	
 end
 
@@ -13327,22 +13327,15 @@ function module:onDamageDealtFired(...)
 	self:showDamageDealt(...)
 end
 
+
 function module:onAmmoChanged(val)
-	self.UI.gunInfoUI.Ammo.Text = '<font size="90">' .. val .. '</font><font size="50">/' .. Settings.maxAmmo .. '</font>'
-end
-
-function module:onToolUnequip()
-	self.UI.gunInfoUI.Enabled = false
-	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
-	self.anims.holdAnim:Stop()
-
-	self.temp.expectingInput = false
-	self.temp.isMouseDown = false
-	self:updateMouseIcon()
+	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 1}).Completed:Wait()
+	self.UI.gunInfoUI.Ammo.Text = '<font size="100"><font color = "rgb(255, 255, 255)">' .. val .. '</font></font><font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
+	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 0})
 end
 
 function module:onToolEquip(playerMouse)
-	self.UI.gunInfoUI.Enabled = true
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.shownPos})
 	self:onAmmoChanged(self.tool.ammo.Value)
 	self:invokeRemote(self.tool.remotes.ChangeStatus, "equip")
 	self.anims.holdAnim:Play()
@@ -13353,6 +13346,16 @@ function module:onToolEquip(playerMouse)
 
 	self:updateMouseIcon()
 	self:initEvents()
+end
+
+function module:onToolUnequip()
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.hiddenPos})
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
+	self.anims.holdAnim:Stop()
+
+	self.temp.expectingInput = false
+	self.temp.isMouseDown = false
+	self:updateMouseIcon()
 end
 
 -- // INIT \\ --
@@ -13381,7 +13384,7 @@ function module.init(tool)
 			reloadAnim = p.Character.Humanoid:LoadAnimation(script.Animations:WaitForChild("Reload")),
 		},		
 		UI = {
-			gunInfoUI = p.PlayerGui:WaitForChild("GunInfo"),
+			gunInfoUI = waitForPath(p.PlayerGui, "GunInfo.Frame"), 
 			toolUI = script:WaitForChild("UI"),
 		},
 		sounds = {
@@ -13422,6 +13425,9 @@ function module.init(tool)
 	-- compile
 
 	self.UI.gunInfoUI:WaitForChild("FireType").Text = Settings.fireType:upper()
+	self.UI.gunInfoUI:WaitForChild("Weapon").Text = script.Name:upper()
+	self.UI.gunInfoUI.Visible = true
+	self.UI.gunInfoUI.Position = Settings.UI.GunInfo.hiddenPos
 	
 end
 
@@ -15601,12 +15607,12 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="ScreenGui" referent="RBXE4DE41062B6E481BACF3C560EDC8BF92">
+		<Item class="ScreenGui" referent="RBX0BBD4417CEE34FA4B98A48D406168FCB">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<bool name="AutoLocalize">true</bool>
 				<int name="DisplayOrder">0</int>
-				<bool name="Enabled">false</bool>
+				<bool name="Enabled">true</bool>
 				<bool name="IgnoreGuiInset">false</bool>
 				<string name="Name">GunInfo</string>
 				<bool name="ResetOnSpawn">true</bool>
@@ -15615,7 +15621,7 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 				<token name="ZIndexBehavior">1</token>
 			</Properties>
-			<Item class="Frame" referent="RBX3B902B4D30E6411C8F84BAE6A6DA6787">
+			<Item class="Frame" referent="RBX1FCA5011F9BB42498CCB964C28B42297">
 				<Properties>
 					<bool name="Active">false</bool>
 					<Vector2 name="AnchorPoint">
@@ -15630,27 +15636,27 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 						<G>1</G>
 						<B>1</B>
 					</Color3>
-					<float name="BackgroundTransparency">0</float>
+					<float name="BackgroundTransparency">1</float>
 					<Color3 name="BorderColor3">
 						<R>0.105882362</R>
 						<G>0.164705887</G>
 						<B>0.207843155</B>
 					</Color3>
 					<token name="BorderMode">0</token>
-					<int name="BorderSizePixel">0</int>
+					<int name="BorderSizePixel">1</int>
 					<bool name="ClipsDescendants">false</bool>
 					<bool name="Draggable">false</bool>
 					<int name="LayoutOrder">0</int>
-					<string name="Name">Bar</string>
+					<string name="Name">Frame</string>
 					<Ref name="NextSelectionDown">null</Ref>
 					<Ref name="NextSelectionLeft">null</Ref>
 					<Ref name="NextSelectionRight">null</Ref>
 					<Ref name="NextSelectionUp">null</Ref>
 					<UDim2 name="Position">
 						<XS>1</XS>
-						<XO>-320</XO>
+						<XO>-420</XO>
 						<YS>1</YS>
-						<YO>-28</YO>
+						<YO>-140</YO>
 					</UDim2>
 					<Ref name="RootLocalizationTable">null</Ref>
 					<float name="Rotation">0</float>
@@ -15658,197 +15664,328 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 					<Ref name="SelectionImageObject">null</Ref>
 					<UDim2 name="Size">
 						<XS>0</XS>
-						<XO>300</XO>
+						<XO>400</XO>
 						<YS>0</YS>
-						<YO>8</YO>
+						<YO>150</YO>
 					</UDim2>
-					<token name="SizeConstraint">1</token>
+					<token name="SizeConstraint">0</token>
 					<int64 name="SourceAssetId">-1</int64>
 					<token name="Style">0</token>
 					<BinaryString name="Tags"></BinaryString>
-					<bool name="Visible">true</bool>
+					<bool name="Visible">false</bool>
 					<int name="ZIndex">1</int>
 				</Properties>
-				<Item class="UIGradient" referent="RBX470FB00589FA4E448B6E67A7AE5DFA34">
+				<Item class="Frame" referent="RBX924FEE41E0164C0797746A3729DA4935">
 					<Properties>
-						<BinaryString name="AttributesSerialize"></BinaryString>
-						<ColorSequence name="Color">0 0.784314 0.784314 0.784314 0 1 0.588235 0.588235 0.588235 0 </ColorSequence>
-						<bool name="Enabled">true</bool>
-						<string name="Name">UIGradient</string>
-						<Vector2 name="Offset">
+						<bool name="Active">false</bool>
+						<Vector2 name="AnchorPoint">
 							<X>0</X>
 							<Y>0</Y>
 						</Vector2>
-						<float name="Rotation">0</float>
-						<int64 name="SourceAssetId">-1</int64>
-						<BinaryString name="Tags"></BinaryString>
-						<NumberSequence name="Transparency">0 0.5 0 1 0.5 0 </NumberSequence>
-					</Properties>
-				</Item>
-				<Item class="UICorner" referent="RBXF8E51DDCC1464199A973A8EF2D253297">
-					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
-						<UDim name="CornerRadius">
-							<S>0</S>
-							<O>3</O>
-						</UDim>
-						<string name="Name">UICorner</string>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<float name="BackgroundTransparency">0</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">0</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<int name="LayoutOrder">0</int>
+						<string name="Name">Bar</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0</XS>
+							<XO>0</XO>
+							<YS>0.5</YS>
+							<YO>0</YO>
+						</UDim2>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<UDim2 name="Size">
+							<XS>1</XS>
+							<XO>0</XO>
+							<YS>0</YS>
+							<YO>15</YO>
+						</UDim2>
+						<token name="SizeConstraint">1</token>
+						<int64 name="SourceAssetId">-1</int64>
+						<token name="Style">0</token>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+					<Item class="UIGradient" referent="RBXE34C0EFD385F4220B08BC65A08A1A5E2">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<ColorSequence name="Color">0 0.784314 0.784314 0.784314 0 1 0.588235 0.588235 0.588235 0 </ColorSequence>
+							<bool name="Enabled">true</bool>
+							<string name="Name">UIGradient</string>
+							<Vector2 name="Offset">
+								<X>0</X>
+								<Y>0</Y>
+							</Vector2>
+							<float name="Rotation">0</float>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<NumberSequence name="Transparency">0 0.5 0 1 0.5 0 </NumberSequence>
+						</Properties>
+					</Item>
+					<Item class="UICorner" referent="RBX9CFB1BBB3ECF4FFC8E9DA91A1DE0D35B">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<UDim name="CornerRadius">
+								<S>0</S>
+								<O>10</O>
+							</UDim>
+							<string name="Name">UICorner</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+				</Item>
+				<Item class="TextLabel" referent="RBX98569D4BD0FC4F759DFB7C34089830E6">
+					<Properties>
+						<bool name="Active">false</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0</X>
+							<Y>0</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<float name="BackgroundTransparency">1</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">1</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<token name="Font">12</token>
+						<int name="LayoutOrder">0</int>
+						<float name="LineHeight">1</float>
+						<string name="Name">Ammo</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0</XS>
+							<XO>0</XO>
+							<YS>0.5</YS>
+							<YO>-85</YO>
+						</UDim2>
+						<bool name="RichText">true</bool>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<UDim2 name="Size">
+							<XS>1</XS>
+							<XO>0</XO>
+							<YS>0</YS>
+							<YO>80</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
+						<string name="Text">&lt;font size = &quot;100&quot;&gt;&lt;font color = &quot;rgb(255, 255, 255)&quot;&gt;100&lt;/font&gt;&lt;/font&gt;&lt;font size = &quot;70&quot;&gt;&lt;font color = &quot;rgb(200, 200, 200)&quot;&gt;/70&lt;/font&gt;&lt;/font&gt;</string>
+						<Color3 name="TextColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<bool name="TextScaled">false</bool>
+						<float name="TextSize">90</float>
+						<Color3 name="TextStrokeColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="TextStrokeTransparency">0.800000012</float>
+						<float name="TextTransparency">0</float>
+						<token name="TextTruncate">0</token>
+						<bool name="TextWrapped">false</bool>
+						<token name="TextXAlignment">0</token>
+						<token name="TextYAlignment">1</token>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
 					</Properties>
 				</Item>
-			</Item>
-			<Item class="TextLabel" referent="RBX26116C4F144840248B4EBDDEE837C06F">
-				<Properties>
-					<bool name="Active">false</bool>
-					<Vector2 name="AnchorPoint">
-						<X>0</X>
-						<Y>0</Y>
-					</Vector2>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<bool name="AutoLocalize">true</bool>
-					<token name="AutomaticSize">0</token>
-					<Color3 name="BackgroundColor3">
-						<R>1</R>
-						<G>1</G>
-						<B>1</B>
-					</Color3>
-					<float name="BackgroundTransparency">1</float>
-					<Color3 name="BorderColor3">
-						<R>0.105882362</R>
-						<G>0.164705887</G>
-						<B>0.207843155</B>
-					</Color3>
-					<token name="BorderMode">0</token>
-					<int name="BorderSizePixel">1</int>
-					<bool name="ClipsDescendants">false</bool>
-					<bool name="Draggable">false</bool>
-					<token name="Font">12</token>
-					<int name="LayoutOrder">0</int>
-					<float name="LineHeight">1</float>
-					<string name="Name">Ammo</string>
-					<Ref name="NextSelectionDown">null</Ref>
-					<Ref name="NextSelectionLeft">null</Ref>
-					<Ref name="NextSelectionRight">null</Ref>
-					<Ref name="NextSelectionUp">null</Ref>
-					<UDim2 name="Position">
-						<XS>1</XS>
-						<XO>-310</XO>
-						<YS>1</YS>
-						<YO>-110</YO>
-					</UDim2>
-					<bool name="RichText">true</bool>
-					<Ref name="RootLocalizationTable">null</Ref>
-					<float name="Rotation">0</float>
-					<bool name="Selectable">false</bool>
-					<Ref name="SelectionImageObject">null</Ref>
-					<UDim2 name="Size">
-						<XS>0</XS>
-						<XO>280</XO>
-						<YS>0</YS>
-						<YO>80</YO>
-					</UDim2>
-					<token name="SizeConstraint">0</token>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<string name="Text">MIN_AMMO/MAX_AMMO</string>
-					<Color3 name="TextColor3">
-						<R>1</R>
-						<G>1</G>
-						<B>1</B>
-					</Color3>
-					<bool name="TextScaled">false</bool>
-					<float name="TextSize">90</float>
-					<Color3 name="TextStrokeColor3">
-						<R>0</R>
-						<G>0</G>
-						<B>0</B>
-					</Color3>
-					<float name="TextStrokeTransparency">0.899999976</float>
-					<float name="TextTransparency">0</float>
-					<token name="TextTruncate">0</token>
-					<bool name="TextWrapped">false</bool>
-					<token name="TextXAlignment">0</token>
-					<token name="TextYAlignment">2</token>
-					<bool name="Visible">true</bool>
-					<int name="ZIndex">1</int>
-				</Properties>
-			</Item>
-			<Item class="TextLabel" referent="RBXD2BE2051668E4530AFE0587890E70737">
-				<Properties>
-					<bool name="Active">false</bool>
-					<Vector2 name="AnchorPoint">
-						<X>0</X>
-						<Y>0</Y>
-					</Vector2>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<bool name="AutoLocalize">true</bool>
-					<token name="AutomaticSize">0</token>
-					<Color3 name="BackgroundColor3">
-						<R>1</R>
-						<G>1</G>
-						<B>1</B>
-					</Color3>
-					<float name="BackgroundTransparency">1</float>
-					<Color3 name="BorderColor3">
-						<R>0.105882362</R>
-						<G>0.164705887</G>
-						<B>0.207843155</B>
-					</Color3>
-					<token name="BorderMode">0</token>
-					<int name="BorderSizePixel">1</int>
-					<bool name="ClipsDescendants">false</bool>
-					<bool name="Draggable">false</bool>
-					<token name="Font">12</token>
-					<int name="LayoutOrder">0</int>
-					<float name="LineHeight">1</float>
-					<string name="Name">FireType</string>
-					<Ref name="NextSelectionDown">null</Ref>
-					<Ref name="NextSelectionLeft">null</Ref>
-					<Ref name="NextSelectionRight">null</Ref>
-					<Ref name="NextSelectionUp">null</Ref>
-					<UDim2 name="Position">
-						<XS>1</XS>
-						<XO>-310</XO>
-						<YS>1</YS>
-						<YO>-110</YO>
-					</UDim2>
-					<bool name="RichText">false</bool>
-					<Ref name="RootLocalizationTable">null</Ref>
-					<float name="Rotation">0</float>
-					<bool name="Selectable">false</bool>
-					<Ref name="SelectionImageObject">null</Ref>
-					<UDim2 name="Size">
-						<XS>0</XS>
-						<XO>280</XO>
-						<YS>0</YS>
-						<YO>80</YO>
-					</UDim2>
-					<token name="SizeConstraint">0</token>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<string name="Text">FIRE_MODE</string>
-					<Color3 name="TextColor3">
-						<R>1</R>
-						<G>1</G>
-						<B>1</B>
-					</Color3>
-					<bool name="TextScaled">false</bool>
-					<float name="TextSize">35</float>
-					<Color3 name="TextStrokeColor3">
-						<R>0</R>
-						<G>0</G>
-						<B>0</B>
-					</Color3>
-					<float name="TextStrokeTransparency">0.899999976</float>
-					<float name="TextTransparency">0</float>
-					<token name="TextTruncate">0</token>
-					<bool name="TextWrapped">false</bool>
-					<token name="TextXAlignment">1</token>
-					<token name="TextYAlignment">2</token>
-					<bool name="Visible">true</bool>
-					<int name="ZIndex">1</int>
-				</Properties>
+				<Item class="TextLabel" referent="RBX9713B3F145534530B8F458B30109865A">
+					<Properties>
+						<bool name="Active">false</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0</X>
+							<Y>0</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<float name="BackgroundTransparency">1</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">1</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<token name="Font">12</token>
+						<int name="LayoutOrder">0</int>
+						<float name="LineHeight">1</float>
+						<string name="Name">FireType</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0</XS>
+							<XO>0</XO>
+							<YS>0.5</YS>
+							<YO>-30</YO>
+						</UDim2>
+						<bool name="RichText">false</bool>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<UDim2 name="Size">
+							<XS>1</XS>
+							<XO>0</XO>
+							<YS>0</YS>
+							<YO>25</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Text">SEMI</string>
+						<Color3 name="TextColor3">
+							<R>0.784313798</R>
+							<G>0.784313798</G>
+							<B>0.784313798</B>
+						</Color3>
+						<bool name="TextScaled">false</bool>
+						<float name="TextSize">30</float>
+						<Color3 name="TextStrokeColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="TextStrokeTransparency">0.800000012</float>
+						<float name="TextTransparency">0</float>
+						<token name="TextTruncate">0</token>
+						<bool name="TextWrapped">false</bool>
+						<token name="TextXAlignment">1</token>
+						<token name="TextYAlignment">1</token>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+				</Item>
+				<Item class="TextLabel" referent="RBXB1EE6A196E27470CB7C9D5E9E706DF56">
+					<Properties>
+						<bool name="Active">false</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0</X>
+							<Y>0</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<float name="BackgroundTransparency">1</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">1</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<token name="Font">12</token>
+						<int name="LayoutOrder">0</int>
+						<float name="LineHeight">1</float>
+						<string name="Name">Weapon</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0</XS>
+							<XO>0</XO>
+							<YS>0.5</YS>
+							<YO>20</YO>
+						</UDim2>
+						<bool name="RichText">false</bool>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<UDim2 name="Size">
+							<XS>1</XS>
+							<XO>0</XO>
+							<YS>0</YS>
+							<YO>25</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Text">PISTOL</string>
+						<Color3 name="TextColor3">
+							<R>0.784313798</R>
+							<G>0.784313798</G>
+							<B>0.784313798</B>
+						</Color3>
+						<bool name="TextScaled">false</bool>
+						<float name="TextSize">30</float>
+						<Color3 name="TextStrokeColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="TextStrokeTransparency">0.800000012</float>
+						<float name="TextTransparency">0</float>
+						<token name="TextTruncate">0</token>
+						<bool name="TextWrapped">false</bool>
+						<token name="TextXAlignment">1</token>
+						<token name="TextYAlignment">1</token>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+				</Item>
 			</Item>
 		</Item>
 	</Item>
@@ -18273,26 +18410,34 @@ collection(NPC_TAG, init)
 	smokeDespawnDelay = 5,
 	
 	-- UI
-	DamageIndicator = {
-		head = {
-			color = Color3.fromRGB(255, 255, 150),
-			strokeColor = Color3.fromRGB(55, 45, 0),
-			stroke = 0.7
+	UI = {
+		DamageIndicator = {
+			head = {
+				color = Color3.fromRGB(255, 255, 150),
+				strokeColor = Color3.fromRGB(55, 45, 0),
+				stroke = 0.7
+			},
+			torso = {
+				color = Color3.fromRGB(255, 255, 255),
+				strokeColor = Color3.fromRGB(0, 0, 0),
+				stroke = 0.7
+			},
+			limb = {
+				color = Color3.fromRGB(255, 255, 255),
+				strokeColor = Color3.fromRGB(0, 0, 0),
+				stroke = 0.7
+			},
+			maxduration = 2,
+			tweenInfo = TweenInfo.new(0.5),
+			minOffset = Vector3.new(-6, -6, 0),
+			maxOffset = Vector3.new(6, 6, 0)
 		},
-		torso = {
-			color = Color3.fromRGB(255, 255, 255),
-			strokeColor = Color3.fromRGB(0, 0, 0),
-			stroke = 0.7
+		GunInfo = {
+			hiddenPos = UDim2.new(1, -420, 1, 0),
+			shownPos = UDim2.new(1, -420, 1, -140),
+			tweenInfo = TweenInfo.new(0.3)
 		},
-		limb = {
-			color = Color3.fromRGB(255, 255, 255),
-			strokeColor = Color3.fromRGB(0, 0, 0),
-			stroke = 0.7
-		},
-		maxduration = 2,
-		tweenInfo = TweenInfo.new(0.5),
-		minOffset = Vector3.new(-6, -6, 0),
-		maxOffset = Vector3.new(6, 6, 0)
+		textFlashTweenInfo = TweenInfo.new(0.1)
 	},
 	
 	-- bullet props

@@ -31,26 +31,34 @@ local Settings = {
 	smokeDespawnDelay = 5,
 	
 	-- UI
-	DamageIndicator = {
-		head = {
-			color = Color3.fromRGB(255, 255, 150),
-			strokeColor = Color3.fromRGB(55, 45, 0),
-			stroke = 0.7
+	UI = {
+		DamageIndicator = {
+			head = {
+				color = Color3.fromRGB(255, 255, 150),
+				strokeColor = Color3.fromRGB(55, 45, 0),
+				stroke = 0.7
+			},
+			torso = {
+				color = Color3.fromRGB(255, 255, 255),
+				strokeColor = Color3.fromRGB(0, 0, 0),
+				stroke = 0.7
+			},
+			limb = {
+				color = Color3.fromRGB(255, 255, 255),
+				strokeColor = Color3.fromRGB(0, 0, 0),
+				stroke = 0.7
+			},
+			maxduration = 2,
+			tweenInfo = TweenInfo.new(0.5),
+			minOffset = Vector3.new(-6, -6, 0),
+			maxOffset = Vector3.new(6, 6, 0)
 		},
-		torso = {
-			color = Color3.fromRGB(255, 255, 255),
-			strokeColor = Color3.fromRGB(0, 0, 0),
-			stroke = 0.7
+		GunInfo = {
+			hiddenPos = UDim2.new(1, -420, 1, 0),
+			shownPos = UDim2.new(1, -420, 1, -140),
+			tweenInfo = TweenInfo.new(0.3)
 		},
-		limb = {
-			color = Color3.fromRGB(255, 255, 255),
-			strokeColor = Color3.fromRGB(0, 0, 0),
-			stroke = 0.7
-		},
-		maxduration = 2,
-		tweenInfo = TweenInfo.new(0.5),
-		minOffset = Vector3.new(-6, -6, 0),
-		maxOffset = Vector3.new(6, 6, 0)
+		textFlashTweenInfo = TweenInfo.new(0.1)
 	},
 	
 	-- bullet props

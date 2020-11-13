@@ -37,15 +37,15 @@ function module:showDamageDealt(receiver, damageType, amount)
 	if root then
 		local newIndicator = self.UI.toolUI.DamageIndicator:Clone() do
 			newIndicator.TextLabel.Text = amount
-			newIndicator.TextLabel.TextColor3 = Settings.DamageIndicator[damageType].color
-			newIndicator.TextLabel.TextStrokeTransparency = Settings.DamageIndicator[damageType].stroke
-			newIndicator.TextLabel.TextStrokeColor3 = Settings.DamageIndicator[damageType].strokeColor
+			newIndicator.TextLabel.TextColor3 = Settings.UI.DamageIndicator[damageType].color
+			newIndicator.TextLabel.TextStrokeTransparency = Settings.UI.DamageIndicator[damageType].stroke
+			newIndicator.TextLabel.TextStrokeColor3 = Settings.UI.DamageIndicator[damageType].strokeColor
 			newIndicator.TextLabel.TextTransparency = 1
 			newIndicator.Enabled = true
 			newIndicator.Parent = root 
 			newIndicator.StudsOffset = Vector3.new(
-				math.random(Settings.DamageIndicator.minOffset.X * 10, Settings.DamageIndicator.maxOffset.X * 10) / 10, 
-				math.random(Settings.DamageIndicator.minOffset.Y * 10, Settings.DamageIndicator.maxOffset.Y * 10) / 10, 
+				math.random(Settings.UI.DamageIndicator.minOffset.X * 10, Settings.UI.DamageIndicator.maxOffset.X * 10) / 10, 
+				math.random(Settings.UI.DamageIndicator.minOffset.Y * 10, Settings.UI.DamageIndicator.maxOffset.Y * 10) / 10, 
 				0
 			)
 		end
@@ -56,9 +56,9 @@ function module:showDamageDealt(receiver, damageType, amount)
 			playSound(self.sounds.nonheadHitSound, self.tool.handle)
 		end
 
-		Debris:AddItem(newIndicator, Settings.DamageIndicator.maxduration)
-		newTween(newIndicator.TextLabel, Settings.DamageIndicator.tweenInfo, {TextTransparency = 0}).Completed:Wait()
-		newTween(newIndicator.TextLabel, Settings.DamageIndicator.tweenInfo, {TextTransparency = 1})
+		Debris:AddItem(newIndicator, Settings.UI.DamageIndicator.maxduration)
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 0}).Completed:Wait()
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 1})
 	end	
 end
 
@@ -145,22 +145,15 @@ function module:onDamageDealtFired(...)
 	self:showDamageDealt(...)
 end
 
+
 function module:onAmmoChanged(val)
-	self.UI.gunInfoUI.Ammo.Text = '<font size="90">' .. val .. '</font><font size="50">/' .. Settings.maxAmmo .. '</font>'
-end
-
-function module:onToolUnequip()
-	self.UI.gunInfoUI.Enabled = false
-	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
-	self.anims.holdAnim:Stop()
-
-	self.temp.expectingInput = false
-	self.temp.isMouseDown = false
-	self:updateMouseIcon()
+	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 1}).Completed:Wait()
+	self.UI.gunInfoUI.Ammo.Text = '<font size="100"><font color = "rgb(255, 255, 255)">' .. val .. '</font></font><font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
+	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 0})
 end
 
 function module:onToolEquip(playerMouse)
-	self.UI.gunInfoUI.Enabled = true
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.shownPos})
 	self:onAmmoChanged(self.tool.ammo.Value)
 	self:invokeRemote(self.tool.remotes.ChangeStatus, "equip")
 	self.anims.holdAnim:Play()
@@ -171,6 +164,16 @@ function module:onToolEquip(playerMouse)
 
 	self:updateMouseIcon()
 	self:initEvents()
+end
+
+function module:onToolUnequip()
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.hiddenPos})
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
+	self.anims.holdAnim:Stop()
+
+	self.temp.expectingInput = false
+	self.temp.isMouseDown = false
+	self:updateMouseIcon()
 end
 
 -- // INIT \\ --
@@ -199,7 +202,7 @@ function module.init(tool)
 			reloadAnim = p.Character.Humanoid:LoadAnimation(script.Animations:WaitForChild("Reload")),
 		},		
 		UI = {
-			gunInfoUI = p.PlayerGui:WaitForChild("GunInfo"),
+			gunInfoUI = waitForPath(p.PlayerGui, "GunInfo.Frame"), 
 			toolUI = script:WaitForChild("UI"),
 		},
 		sounds = {
@@ -240,6 +243,9 @@ function module.init(tool)
 	-- compile
 
 	self.UI.gunInfoUI:WaitForChild("FireType").Text = Settings.fireType:upper()
+	self.UI.gunInfoUI:WaitForChild("Weapon").Text = script.Name:upper()
+	self.UI.gunInfoUI.Visible = true
+	self.UI.gunInfoUI.Position = Settings.UI.GunInfo.hiddenPos
 	
 end
 
