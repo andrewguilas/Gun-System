@@ -159,6 +159,7 @@ function module:onMouseEventFired(p, mousePoint)
 	-- debounce	
 	if not self.temp.canFire or os.clock() - self.temp.timeOfRecentFire < 60 / Settings.fireRate then
 		playSound(self.sounds.jamSound, self.tool.handle)
+		return false, "GUN_JAMMED"
 	end
 	self.temp.timeOfRecentFire = os.clock()
 	self.temp.canFire = false	
@@ -178,8 +179,20 @@ function module:onMouseEventFired(p, mousePoint)
 
 	-- fire gun
 	local mouseDirection = (mousePoint - self.tool.firePointObj.WorldPosition).Unit
-	for i = 1, Settings.bulletsPerShot do
+
+	local bulletsToShoot
+	if self.tool.fireMode.Value == "burst" then
+		bulletsToShoot = self.tool.ammo.Value >= Settings.burstBulletsPerShot and Settings.burstBulletsPerShot or self.tool.ammo.Value
+	else
+		bulletsToShoot = 1
+	end
+
+	for i = 1, bulletsToShoot do
 		self:fire(mouseDirection, p)
+
+		if self.tool.fireMode.Value == "burst" then
+			wait(Settings.burstShoootDelay)
+		end	
 	end
 
 	-- end debounce
@@ -207,6 +220,24 @@ function module:onChangeStatusFired(p, status)
 	end
 end
 
+function module:onChangeFireMode(p)
+	local fireModes = Settings.fireMode
+	local oldFireModeIndex = table.find(fireModes, self.tool.fireMode.Value)
+	local newFireMode
+
+	if oldFireModeIndex == #fireModes and oldFireModeIndex ~= 1 then
+		newFireMode = fireModes[1]
+	elseif oldFireModeIndex < #fireModes then
+		newFireMode = fireModes[oldFireModeIndex + 1]
+	end
+
+	print(newFireMode)
+	if newFireMode then
+		self.tool.fireMode.Value = newFireMode
+		return newFireMode
+	end
+end
+
 function module.init(tool)
 	
 	-- create dictionary
@@ -220,6 +251,7 @@ function module.init(tool)
 			remotes = tool.Remotes,
 			values = tool.Values,
 			ammo = tool.Values.Ammo,
+			fireMode = tool.Values.FireMode
 		},
 		sounds = {
 			sounds = tool.Sounds,
@@ -313,9 +345,13 @@ function module.init(tool)
 	end
 	
 	self.tool.remotes.ChangeStatus.OnServerInvoke = function(...)
-		self:onChangeStatusFired(...)
+		return self:onChangeStatusFired(...)
 	end
-	
+
+	self.tool.remotes.ChangeFireMode.OnServerInvoke = function(...)
+		return self:onChangeFireMode(...)
+	end
+
 end
 
 -- // COMPILE \\ --

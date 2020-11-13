@@ -82,9 +82,8 @@ function module:reloadGun()
 end
 
 function module:initEvents()
-	if Settings.fireType == "auto" then	
-		disconnectCon({self.temp.currentOnInputBegan, self.temp.currentOnInputEnded, self.temp.currentOnStepped})
-		
+	disconnectCon({self.temp.currentOnInputBegan, self.temp.currentOnInputEnded, self.temp.currentOnStepped})
+	if self.tool.fireMode.Value == "auto" then	
 		self.temp.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
 			self:onInputBegan(...)
 		end)
@@ -96,9 +95,7 @@ function module:initEvents()
 		self.temp.currentOnStepped = RunService.Stepped:Connect(function(...)
 			self:onStepped(...)
 		end)
-	elseif Settings.fireType == "semi" then
-		disconnectCon({self.temp.currentOnInputBegan})
-	
+	else
 		self.temp.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
 			self:onInputBegan(...)
 		end)
@@ -118,14 +115,22 @@ function module:onInputBegan(input, gameProcessed)
 		return
 	end
 
-	if input.UserInputType == Settings.keybinds.shoot then	
-		isMouseDown = true
-		if Settings.fireType == "semi" and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
+	if input.UserInputType == Settings.keybinds.shoot and self.tool.fireMode.Value ~= "safety" then	
+		if self.tool.fireMode.Value == "auto" then
+			self.temp.isMouseDown = true
+		elseif self.tool.fireMode.Value == "semi" or self.tool.fireMode.Value == "burst" and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
 			self:shootGun()
 		end	
 	elseif input.KeyCode == Settings.keybinds.reload then
-		isMouseDown = false
+		self.temp.isMouseDown = false
 		self:reloadGun()
+	elseif input.KeyCode == Settings.keybinds.fireMode then
+		local oldFireMode = self.tool.fireMode.Value
+		local newFireMode = self.tool.remotes.ChangeFireMode:InvokeServer()
+		if newFireMode and newFireMode ~= oldFireMode then
+			self:updateUI()
+			self:initEvents()
+		end
 	end		
 end
 
@@ -135,7 +140,7 @@ function module:onInputEnded(input, gamehandledEvent)
 	end
 
 	if input.UserInputType == Settings.keybinds.shoot then
-		isMouseDown = false
+		self.temp.isMouseDown = false
 	end
 end
 
@@ -145,16 +150,17 @@ function module:onDamageDealtFired(...)
 	self:showDamageDealt(...)
 end
 
-
-function module:onAmmoChanged(val)
+function module:updateUI()
 	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 1}).Completed:Wait()
-	self.UI.gunInfoUI.Ammo.Text = '<font size="100"><font color = "rgb(255, 255, 255)">' .. val .. '</font></font><font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
+	self.UI.gunInfoUI.Ammo.Text = '<font size="100"><font color = "rgb(255, 255, 255)">' .. self.tool.ammo.Value .. '</font></font><font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
+	self.UI.gunInfoUI.FireMode.Text = self.tool.fireMode.Value:upper()
+	self.UI.gunInfoUI.Weapon.Text = script.Name:upper()
 	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 0})
 end
 
 function module:onToolEquip(playerMouse)
 	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.shownPos})
-	self:onAmmoChanged(self.tool.ammo.Value)
+	self:updateUI()
 	self:invokeRemote(self.tool.remotes.ChangeStatus, "equip")
 	self.anims.holdAnim:Play()
 
@@ -193,6 +199,7 @@ function module.init(tool)
 			Settings = require(game.ReplicatedStorage.Settings[tool.Name]),
 			handle = tool:WaitForChild("Handle"),
 			ammo = waitForPath(tool, "Values.Ammo"),
+			fireMode = waitForPath(tool, "Values.FireMode"),
 			remotes = tool:WaitForChild("Remotes"),
 		},
 		anims = {
@@ -232,8 +239,8 @@ function module.init(tool)
 		self:onToolUnequip(...)
 	end)
 	
-	self.tool.ammo.Changed:Connect(function(...)
-		self:onAmmoChanged(...)
+	self.tool.ammo.Changed:Connect(function()
+		self:updateUI()
 	end)
 	
 	self.tool.remotes:WaitForChild("DamageDealt").OnClientEvent:Connect(function(...)
@@ -242,8 +249,7 @@ function module.init(tool)
 	
 	-- compile
 
-	self.UI.gunInfoUI:WaitForChild("FireType").Text = Settings.fireType:upper()
-	self.UI.gunInfoUI:WaitForChild("Weapon").Text = script.Name:upper()
+	self:updateUI()
 	self.UI.gunInfoUI.Visible = true
 	self.UI.gunInfoUI.Position = Settings.UI.GunInfo.hiddenPos
 	

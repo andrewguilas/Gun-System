@@ -13264,7 +13264,7 @@ function module:reloadGun()
 end
 
 function module:initEvents()
-	if Settings.fireType == "auto" then	
+	if Settings.fireMode == "auto" then	
 		disconnectCon({self.temp.currentOnInputBegan, self.temp.currentOnInputEnded, self.temp.currentOnStepped})
 		
 		self.temp.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
@@ -13278,7 +13278,7 @@ function module:initEvents()
 		self.temp.currentOnStepped = RunService.Stepped:Connect(function(...)
 			self:onStepped(...)
 		end)
-	elseif Settings.fireType == "semi" then
+	elseif Settings.fireMode == "semi" then
 		disconnectCon({self.temp.currentOnInputBegan})
 	
 		self.temp.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
@@ -13302,7 +13302,7 @@ function module:onInputBegan(input, gameProcessed)
 
 	if input.UserInputType == Settings.keybinds.shoot then	
 		isMouseDown = true
-		if Settings.fireType == "semi" and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
+		if Settings.fireMode == "semi" and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
 			self:shootGun()
 		end	
 	elseif input.KeyCode == Settings.keybinds.reload then
@@ -13424,7 +13424,7 @@ function module.init(tool)
 	
 	-- compile
 
-	self.UI.gunInfoUI:WaitForChild("FireType").Text = Settings.fireType:upper()
+	self.UI.gunInfoUI:WaitForChild("FireMode").Text = Settings.fireType:upper()
 	self.UI.gunInfoUI:WaitForChild("Weapon").Text = script.Name:upper()
 	self.UI.gunInfoUI.Visible = true
 	self.UI.gunInfoUI.Position = Settings.UI.GunInfo.hiddenPos

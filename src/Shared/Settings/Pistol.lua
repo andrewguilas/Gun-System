@@ -5,8 +5,10 @@ local Settings = {
 	
 	-- gun
 	mouseIcon = "rbxassetid://131581677",
-	fireType = "semi", -- auto/semi
+	fireMode = {"safety", "semi", "burst", "auto"}, -- array: safety, semi, burst, auto
 	bulletsPerShot = 1,
+	burstBulletsPerShot = 3,
+	burstShoootDelay = 0.1,
 	maxAmmo = 12,
 	reloadTime = 3,
 	minBulletSpreadAngle = 0, -- between 0 and 180, in degrees
@@ -80,7 +82,8 @@ local Settings = {
 	-- keybinds
 	keybinds = {
 		shoot = Enum.UserInputType.MouseButton1,
-		reload = Enum.KeyCode.R
+		reload = Enum.KeyCode.R,
+		fireMode = Enum.KeyCode.V
 	}
 }
 
