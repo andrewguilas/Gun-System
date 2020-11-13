@@ -13264,9 +13264,8 @@ function module:reloadGun()
 end
 
 function module:initEvents()
-	if Settings.fireMode == "auto" then	
-		disconnectCon({self.temp.currentOnInputBegan, self.temp.currentOnInputEnded, self.temp.currentOnStepped})
-		
+	disconnectCon({self.temp.currentOnInputBegan, self.temp.currentOnInputEnded, self.temp.currentOnStepped})
+	if self.tool.fireMode.Value == "auto" then	
 		self.temp.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
 			self:onInputBegan(...)
 		end)
@@ -13278,9 +13277,7 @@ function module:initEvents()
 		self.temp.currentOnStepped = RunService.Stepped:Connect(function(...)
 			self:onStepped(...)
 		end)
-	elseif Settings.fireMode == "semi" then
-		disconnectCon({self.temp.currentOnInputBegan})
-	
+	else
 		self.temp.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
 			self:onInputBegan(...)
 		end)
@@ -13300,14 +13297,22 @@ function module:onInputBegan(input, gameProcessed)
 		return
 	end
 
-	if input.UserInputType == Settings.keybinds.shoot then	
-		isMouseDown = true
-		if Settings.fireMode == "semi" and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
+	if input.UserInputType == Settings.keybinds.shoot and self.tool.fireMode.Value ~= "safety" then	
+		if self.tool.fireMode.Value == "auto" then
+			self.temp.isMouseDown = true
+		elseif self.tool.fireMode.Value == "semi" or self.tool.fireMode.Value == "burst" and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
 			self:shootGun()
 		end	
 	elseif input.KeyCode == Settings.keybinds.reload then
-		isMouseDown = false
+		self.temp.isMouseDown = false
 		self:reloadGun()
+	elseif input.KeyCode == Settings.keybinds.fireMode then
+		local oldFireMode = self.tool.fireMode.Value
+		local newFireMode = self.tool.remotes.ChangeFireMode:InvokeServer()
+		if newFireMode and newFireMode ~= oldFireMode then
+			self:updateUI()
+			self:initEvents()
+		end
 	end		
 end
 
@@ -13317,7 +13322,7 @@ function module:onInputEnded(input, gamehandledEvent)
 	end
 
 	if input.UserInputType == Settings.keybinds.shoot then
-		isMouseDown = false
+		self.temp.isMouseDown = false
 	end
 end
 
@@ -13327,16 +13332,17 @@ function module:onDamageDealtFired(...)
 	self:showDamageDealt(...)
 end
 
-
-function module:onAmmoChanged(val)
+function module:updateUI()
 	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 1}).Completed:Wait()
-	self.UI.gunInfoUI.Ammo.Text = '<font size="100"><font color = "rgb(255, 255, 255)">' .. val .. '</font></font><font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
+	self.UI.gunInfoUI.Ammo.Text = '<font size="100"><font color = "rgb(255, 255, 255)">' .. self.tool.ammo.Value .. '</font></font><font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
+	self.UI.gunInfoUI.FireMode.Text = self.tool.fireMode.Value:upper()
+	self.UI.gunInfoUI.Weapon.Text = script.Name:upper()
 	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 0})
 end
 
 function module:onToolEquip(playerMouse)
 	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.shownPos})
-	self:onAmmoChanged(self.tool.ammo.Value)
+	self:updateUI()
 	self:invokeRemote(self.tool.remotes.ChangeStatus, "equip")
 	self.anims.holdAnim:Play()
 
@@ -13375,6 +13381,7 @@ function module.init(tool)
 			Settings = require(game.ReplicatedStorage.Settings[tool.Name]),
 			handle = tool:WaitForChild("Handle"),
 			ammo = waitForPath(tool, "Values.Ammo"),
+			fireMode = waitForPath(tool, "Values.FireMode"),
 			remotes = tool:WaitForChild("Remotes"),
 		},
 		anims = {
@@ -13414,8 +13421,8 @@ function module.init(tool)
 		self:onToolUnequip(...)
 	end)
 	
-	self.tool.ammo.Changed:Connect(function(...)
-		self:onAmmoChanged(...)
+	self.tool.ammo.Changed:Connect(function()
+		self:updateUI()
 	end)
 	
 	self.tool.remotes:WaitForChild("DamageDealt").OnClientEvent:Connect(function(...)
@@ -13424,8 +13431,7 @@ function module.init(tool)
 	
 	-- compile
 
-	self.UI.gunInfoUI:WaitForChild("FireMode").Text = Settings.fireType:upper()
-	self.UI.gunInfoUI:WaitForChild("Weapon").Text = script.Name:upper()
+	self:updateUI()
 	self.UI.gunInfoUI.Visible = true
 	self.UI.gunInfoUI.Position = Settings.UI.GunInfo.hiddenPos
 	
@@ -15410,6 +15416,15 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 						<int64 name="Value">0</int64>
 					</Properties>
 				</Item>
+				<Item class="StringValue" referent="RBX42F7F22EFEA04494914CAEE211F4CB09">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">FireMode</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Value">semi</string>
+					</Properties>
+				</Item>
 			</Item>
 			<Item class="Folder" referent="RBX487A999243304AF6997BC01C5F026752">
 				<Properties>
@@ -15438,6 +15453,14 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">DamageDealt</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="RemoteFunction" referent="RBX3771FB11F3404B35BB250CA8F2204A48">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">ChangeFireMode</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
@@ -15862,7 +15885,7 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 						<token name="Font">12</token>
 						<int name="LayoutOrder">0</int>
 						<float name="LineHeight">1</float>
-						<string name="Name">FireType</string>
+						<string name="Name">FireMode</string>
 						<Ref name="NextSelectionDown">null</Ref>
 						<Ref name="NextSelectionLeft">null</Ref>
 						<Ref name="NextSelectionRight">null</Ref>
@@ -16639,6 +16662,7 @@ function module:onMouseEventFired(p, mousePoint)
 	-- debounce	
 	if not self.temp.canFire or os.clock() - self.temp.timeOfRecentFire < 60 / Settings.fireRate then
 		playSound(self.sounds.jamSound, self.tool.handle)
+		return false, "GUN_JAMMED"
 	end
 	self.temp.timeOfRecentFire = os.clock()
 	self.temp.canFire = false	
@@ -16658,8 +16682,20 @@ function module:onMouseEventFired(p, mousePoint)
 
 	-- fire gun
 	local mouseDirection = (mousePoint - self.tool.firePointObj.WorldPosition).Unit
-	for i = 1, Settings.bulletsPerShot do
+
+	local bulletsToShoot
+	if self.tool.fireMode.Value == "burst" then
+		bulletsToShoot = self.tool.ammo.Value >= Settings.burstBulletsPerShot and Settings.burstBulletsPerShot or self.tool.ammo.Value
+	else
+		bulletsToShoot = 1
+	end
+
+	for i = 1, bulletsToShoot do
 		self:fire(mouseDirection, p)
+
+		if self.tool.fireMode.Value == "burst" then
+			wait(Settings.burstShoootDelay)
+		end	
 	end
 
 	-- end debounce
@@ -16687,6 +16723,24 @@ function module:onChangeStatusFired(p, status)
 	end
 end
 
+function module:onChangeFireMode(p)
+	local fireModes = Settings.fireMode
+	local oldFireModeIndex = table.find(fireModes, self.tool.fireMode.Value)
+	local newFireMode
+
+	if oldFireModeIndex == #fireModes and oldFireModeIndex ~= 1 then
+		newFireMode = fireModes[1]
+	elseif oldFireModeIndex < #fireModes then
+		newFireMode = fireModes[oldFireModeIndex + 1]
+	end
+
+	print(newFireMode)
+	if newFireMode then
+		self.tool.fireMode.Value = newFireMode
+		return newFireMode
+	end
+end
+
 function module.init(tool)
 	
 	-- create dictionary
@@ -16700,6 +16754,7 @@ function module.init(tool)
 			remotes = tool.Remotes,
 			values = tool.Values,
 			ammo = tool.Values.Ammo,
+			fireMode = tool.Values.FireMode
 		},
 		sounds = {
 			sounds = tool.Sounds,
@@ -16793,9 +16848,13 @@ function module.init(tool)
 	end
 	
 	self.tool.remotes.ChangeStatus.OnServerInvoke = function(...)
-		self:onChangeStatusFired(...)
+		return self:onChangeStatusFired(...)
 	end
-	
+
+	self.tool.remotes.ChangeFireMode.OnServerInvoke = function(...)
+		return self:onChangeFireMode(...)
+	end
+
 end
 
 -- // COMPILE \\ --
@@ -18384,8 +18443,10 @@ collection(NPC_TAG, init)
 	
 	-- gun
 	mouseIcon = "rbxassetid://131581677",
-	fireType = "semi", -- auto/semi
+	fireMode = {"safety", "semi", "burst", "auto"}, -- array: safety, semi, burst, auto
 	bulletsPerShot = 1,
+	burstBulletsPerShot = 3,
+	burstShoootDelay = 0.1,
 	maxAmmo = 12,
 	reloadTime = 3,
 	minBulletSpreadAngle = 0, -- between 0 and 180, in degrees
@@ -18459,7 +18520,8 @@ collection(NPC_TAG, init)
 	-- keybinds
 	keybinds = {
 		shoot = Enum.UserInputType.MouseButton1,
-		reload = Enum.KeyCode.R
+		reload = Enum.KeyCode.R,
+		fireMode = Enum.KeyCode.V
 	}
 }
 
