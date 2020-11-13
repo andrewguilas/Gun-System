@@ -231,7 +231,6 @@ function module:onChangeFireMode(p)
 		newFireMode = fireModes[oldFireModeIndex + 1]
 	end
 
-	print(newFireMode)
 	if newFireMode then
 		self.tool.fireMode.Value = newFireMode
 		return newFireMode
