@@ -63,18 +63,18 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>10.798871</X>
-					<Y>34.4909782</Y>
-					<Z>36.0280113</Z>
-					<R00>0.386202127</R00>
-					<R01>-0.60273093</R01>
-					<R02>0.698257446</R02>
-					<R10>-1.4901163e-08</R10>
-					<R11>0.756989121</R11>
-					<R12>0.653427541</R12>
-					<R20>-0.922414303</R20>
-					<R21>-0.252355099</R21>
-					<R22>0.292350709</R22>
+					<X>10.8488817</X>
+					<Y>34.5347977</Y>
+					<Z>35.7317924</Z>
+					<R00>0.195583835</R00>
+					<R01>-0.662295878</R01>
+					<R02>0.723264277</R02>
+					<R10>-0</R10>
+					<R11>0.737507761</R11>
+					<R12>0.675338686</R12>
+					<R20>-0.980687022</R20>
+					<R21>-0.132085323</R21>
+					<R22>0.144244596</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
@@ -18450,7 +18450,7 @@ collection(NPC_TAG, init)
 	
 	-- gun
 	mouseIcon = "rbxassetid://131581677",
-	fireMode = {"safety", "semi", "burst", "auto"}, -- array: safety, semi, burst, auto
+	fireMode = {"safety", "semi"}, -- array: safety, semi, burst, auto
 	bulletsPerShot = 1,
 	burstBulletsPerShot = 3,
 	burstShoootDelay = 0.1,
