@@ -5,7 +5,7 @@ local Settings = {
 	
 	-- gun
 	mouseIcon = "rbxassetid://131581677",
-	fireMode = {"safety", "semi", "burst", "auto"}, -- array: safety, semi, burst, auto
+	fireMode = {"safety", "semi"}, -- array: safety, semi, burst, auto
 	bulletsPerShot = 1,
 	burstBulletsPerShot = 3,
 	burstShoootDelay = 0.1,
