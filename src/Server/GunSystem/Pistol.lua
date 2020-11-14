@@ -22,6 +22,8 @@ cosmeticBulletsFolder.Name = "CosmeticBulletsFolder"
 
 -- // FUNCTIONS \\ --
 
+-- effects
+
 function module:playSmoke()
 	local newSmoke = self.VFX.smoke:Clone()
 	newSmoke.Enabled = true
@@ -67,6 +69,15 @@ end
 
 -- indirect
 
+function module:getCharFromHitPart(part)
+	for _,p in pairs(game.Players:GetPlayers()) do
+		local char = p.Character
+		if char and part:IsDescendantOf(char) then
+			return char
+		end
+	end
+end
+
 function module:fire(direction, sender)	
 	-- random angles
 	local directionalCF = CFrame.new(Vector3.new(), direction)
@@ -104,25 +115,27 @@ function module:onRayHit(cast, raycastResult, segmentVelocity, cosmeticBulletObj
 	local normal = raycastResult.Normal
 
 	-- check if hit
-	if hitPart and hitPart.Parent then
-		local hum = hitPart.Parent:FindFirstChildOfClass("Humanoid")
-		if hum then
-			-- deal dmg
-			local damageType, amount
-			if table.find({"Head"}, hitPart.Name) then
-				damageType = "head"
-				amount = Settings.headDamage
-				hum:TakeDamage(amount)
-			elseif table.find({"UpperTorso", "LowerTorso", "HumanoidRootPart"}, hitPart.Name) then
-				damageType = "torso"
-				amount = Settings.torsoDamage
-				hum:TakeDamage(amount)
-			else
-				damageType = "limb"
-				amount = Settings.limbDamage
-				hum:TakeDamage(amount)
+	if hitPart then
+		local char = self:getCharFromHitPart(hitPart)
+		if char then
+			local hum = char:FindFirstChildWhichIsA("Humanoid")
+			if hum then
+				local damageType, amount
+				if table.find({"Head"}, hitPart.Name) then
+					damageType = "head"
+					amount = Settings.headDamage
+					hum:TakeDamage(amount)
+				elseif table.find({"UpperTorso", "LowerTorso", "HumanoidRootPart"}, hitPart.Name) then
+					damageType = "torso"
+					amount = Settings.torsoDamage
+					hum:TakeDamage(amount)
+				else
+					damageType = "limb"
+					amount = Settings.limbDamage
+					hum:TakeDamage(amount)
+				end
+				self.tool.remotes.DamageDealt:FireClient(sender, hitPart.Parent, damageType, amount)
 			end
-			self.tool.remotes.DamageDealt:FireClient(sender, hitPart.Parent, damageType, amount)
 		end
 		self:playHitFX(hitPart, hitPoint, normal)
 	end
