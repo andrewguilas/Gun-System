@@ -63,27 +63,27 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>24.2917442</X>
-					<Y>21.6157131</Y>
-					<Z>32.464386</Z>
-					<R00>-0.198321104</R00>
-					<R01>0.595867395</R01>
-					<R02>-0.778210044</R02>
-					<R10>7.4505806e-09</R10>
-					<R11>0.793980837</R11>
-					<R12>0.607942879</R12>
-					<R20>0.980137169</R20>
-					<R21>0.120567895</R21>
-					<R22>-0.157463148</R22>
+					<X>7.83605766</X>
+					<Y>34.4016457</Y>
+					<Z>35.6970139</Z>
+					<R00>0.159902677</R00>
+					<R01>0.600940943</R01>
+					<R02>-0.783135414</R02>
+					<R10>-0</R10>
+					<R11>0.793343544</R11>
+					<R12>0.608774185</R12>
+					<R20>0.987132788</R20>
+					<R21>-0.097344622</R21>
+					<R22>0.126857758</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>25.8481636</X>
-					<Y>20.399828</Y>
-					<Z>32.7793121</Z>
+					<X>9.40232849</X>
+					<Y>33.1840973</Y>
+					<Z>35.4432983</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -13233,9 +13233,9 @@ function module:showDamageDealt(receiver, damageType, amount)
 		end
 
 		if damageType == "head" then
-			playSound(self.sounds.headHitSound, self.tool.handle)
+			playSound(self.sounds.hitSound, self.tool.handle)
 		else
-			playSound(self.sounds.nonheadHitSound, self.tool.handle)
+			playSound(self.sounds.hitSound, self.tool.handle)
 		end
 
 		Debris:AddItem(newIndicator, Settings.UI.DamageIndicator.maxduration)
@@ -13395,8 +13395,7 @@ function module.init(tool)
 			toolUI = script:WaitForChild("UI"),
 		},
 		sounds = {
-			headHitSound = tool.Handle:WaitForChild("HeadHit"),
-			nonheadHitSound = tool.Handle:WaitForChild("NonheadHit"),
+			hitSound = tool.Handle:WaitForChild("Hit")
 		},		
 		temp = {
 			timeOfRecentFire = os.clock(),
@@ -15497,7 +15496,7 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<float name="EmitterSize">10</float>
 						<bool name="Looped">false</bool>
-						<string name="Name">HeadHit</string>
+						<string name="Name">Hit</string>
 						<bool name="PlayOnRemove">false</bool>
 						<float name="PlaybackSpeed">1</float>
 						<bool name="Playing">false</bool>
@@ -15527,25 +15526,6 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 						<double name="TimePosition">0</double>
 						<float name="Volume">3</float>
-						<float name="xmlRead_MaxDistance_3">10000</float>
-					</Properties>
-				</Item>
-				<Item class="Sound" referent="RBX5C20566606C44832BD71105D3F401659">
-					<Properties>
-						<BinaryString name="AttributesSerialize"></BinaryString>
-						<float name="EmitterSize">10</float>
-						<bool name="Looped">false</bool>
-						<string name="Name">NonheadHit</string>
-						<bool name="PlayOnRemove">false</bool>
-						<float name="PlaybackSpeed">1</float>
-						<bool name="Playing">false</bool>
-						<token name="RollOffMode">0</token>
-						<Ref name="SoundGroup">null</Ref>
-						<Content name="SoundId"><url>rbxassetid://1489924400</url></Content>
-						<int64 name="SourceAssetId">1489924400</int64>
-						<BinaryString name="Tags"></BinaryString>
-						<double name="TimePosition">0</double>
-						<float name="Volume">1.5</float>
 						<float name="xmlRead_MaxDistance_3">10000</float>
 					</Properties>
 				</Item>
