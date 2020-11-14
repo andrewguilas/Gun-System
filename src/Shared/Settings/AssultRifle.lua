@@ -5,15 +5,15 @@ local Settings = {
 	
 	-- gun
 	mouseIcon = "rbxassetid://131581677",
-	fireMode = {"semi", "safety"}, -- array: safety, semi, burst, auto
+	fireMode = {"auto", "burst", "semi", "safety"}, -- array: safety, semi, burst, auto
 	bulletsPerShot = 1,
 	burstBulletsPerShot = 3,
 	burstShoootDelay = 0.1,
-	maxAmmo = 12,
+	maxAmmo = 30,
 	reloadTime = 3,
 	minBulletSpreadAngle = 0, -- between 0 and 180, in degrees
 	maxBulletSpreadAngle = 0, -- between 0 and 180, in degrees
-	fireRate = 720,
+	fireRate = 900,
 	
 	-- damage
 	headDamage = 35,
@@ -21,8 +21,8 @@ local Settings = {
 	limbDamage = 20,
 	
 	-- bullets
-	bulletSpeed = 1500, -- studs/sec
-	bulletMaxDist = 55, -- studs
+	bulletSpeed = 2800, -- studs/sec
+	bulletMaxDist = 165, -- studs
 	bulletGravity = Vector3.new(0, -workspace.Gravity, 0),
 	bulletLengthMultiplier = 200,
 	

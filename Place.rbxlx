@@ -63,27 +63,27 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>10.8488817</X>
-					<Y>34.5347977</Y>
-					<Z>35.7317924</Z>
-					<R00>0.195583835</R00>
-					<R01>-0.662295878</R01>
-					<R02>0.723264277</R02>
-					<R10>-0</R10>
-					<R11>0.737507761</R11>
-					<R12>0.675338686</R12>
-					<R20>-0.980687022</R20>
-					<R21>-0.132085323</R21>
-					<R22>0.144244596</R22>
+					<X>-25.3746433</X>
+					<Y>34.5111351</Y>
+					<Z>9.44398785</Z>
+					<R00>-0.998113394</R00>
+					<R01>0.0112524936</R01>
+					<R02>-0.06035804</R02>
+					<R10>9.31322464e-10</R10>
+					<R11>0.983062446</R11>
+					<R12>0.183271393</R12>
+					<R20>0.0613979772</R20>
+					<R21>0.182925627</R21>
+					<R22>-0.981207728</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>9.40232849</X>
-					<Y>33.1840973</Y>
-					<Z>35.4432983</Z>
+					<X>-25.2539272</X>
+					<Y>34.1445923</Y>
+					<Z>11.4064035</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -13625,6 +13625,456 @@ return module]]></ProtectedString>
 						</Item>
 					</Item>
 				</Item>
+				<Item class="ModuleScript" referent="RBXCD7AAE300E2C4C44B182FF8560C43937">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">AssultRifle</string>
+						<string name="ScriptGuid">{37AD1AE8-4572-49F0-8440-483F98C7AFEC}</string>
+						<ProtectedString name="Source"><![CDATA[local module = {}
+module.__index = module
+
+-- // VARIABLES \\ --
+
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Debris = game:GetService("Debris")
+
+local Settings = require(game.ReplicatedStorage.Settings[script.Name])
+local Core = require(game.ReplicatedStorage.Core)
+local waitForPath = Core("waitForPath")
+local newThread = Core("newThread")
+local newTween = Core("newTween")
+local playSound = Core("playSound")
+local disconnectCon = Core("disconnectCon")
+local randomnum = Core("randomnum")
+
+local p = game.Players.LocalPlayer
+
+-- // FUNCTIONS \\ --
+
+function module:invokeRemote(remote, ...)
+	local success, msg = remote:InvokeServer(...)
+	if msg and Settings.willDebug then
+		if success then
+			print(msg)
+		else
+			warn(msg)
+		end
+	end
+	return success, msg
+end
+
+-- indirect
+
+function module:updateMouseIcon()
+	if self.temp.mouse and not self.tool.tool.Parent:IsA("Backpack") then
+		self.temp.mouse.Icon = Settings.mouseIcon
+	end
+end
+
+function module:shootGun()
+	self.temp.timeOfRecentFire = os.clock()
+	local success, errorMsg = self:invokeRemote(self.tool.remotes.MouseEvent, self.temp.mouse.Hit.Position)
+	if errorMsg ~= "NO_AMMO" then
+		self.anims.shootAnim:Play()
+	end
+end
+
+function module:reloadGun()
+	self.anims.reloadAnim:Play()
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "reload")
+end
+
+function module:initEvents()
+	disconnectCon(self.temp.connections)
+
+	self.temp.connections.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
+		self:onInputBegan(...)
+	end)
+
+	if self.tool.fireMode.Value == "auto" then	
+		self.temp.connections.currentOnInputEnded = UserInputService.InputEnded:Connect(function(...)
+			self:onInputEnded(...)
+		end)
+	
+		self.temp.connections.currentOnStepped = RunService.Stepped:Connect(function(...)
+			self:onStepped(...)
+		end)
+	end
+end
+
+-- service events
+
+function module:onStepped()
+	if self.temp.isMouseDown and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
+		self:shootGun()
+	end
+end
+
+function module:onInputBegan(input, gameProcessed)
+	if gameProcessed or not self.temp.expectingInput or not self.temp.mouse then
+		return
+	end
+
+	if input.UserInputType == Settings.keybinds.shoot and self.tool.fireMode.Value ~= "safety" then	
+		if self.tool.fireMode.Value == "auto" then
+			self.temp.isMouseDown = true
+		elseif self.tool.fireMode.Value == "semi" or self.tool.fireMode.Value == "burst" and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
+			self:shootGun()
+		end	
+	elseif input.KeyCode == Settings.keybinds.reload then
+		self.temp.isMouseDown = false
+		self:reloadGun()
+	elseif input.KeyCode == Settings.keybinds.fireMode then
+		local oldFireMode = self.tool.fireMode.Value
+		local newFireMode = self.tool.remotes.ChangeFireMode:InvokeServer()
+		if newFireMode and newFireMode ~= oldFireMode then
+			self:updateUI()
+			self:initEvents()
+		end
+	end		
+end
+
+function module:onInputEnded(input, gamehandledEvent)
+	if gamehandledEvent or not self.temp.expectingInput or not self.temp.mouse then
+		return
+	end
+
+	if input.UserInputType == Settings.keybinds.shoot then
+		self.temp.isMouseDown = false
+	end
+end
+
+-- instance events
+
+function module:onToolEquip(playerMouse)
+	self.temp.mouse = playerMouse
+	self.temp.expectingInput = true
+	self.temp.isMouseDown = false
+
+	newThread(function()
+		self:updateUI()
+	end)
+
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.shownPos})
+	self:updateMouseIcon()
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "equip")
+	self.anims.holdAnim:Play()
+	self:initEvents()
+end
+
+function module:onToolUnequip()
+
+	self.temp.expectingInput = false
+	self.temp.isMouseDown = false
+
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.hiddenPos})
+	self:updateMouseIcon()
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
+	self.anims.holdAnim:Stop()
+	disconnectCon(self.temp.connections)
+end
+
+function module:updateUI()
+	local UI = self.UI.gunInfoUI
+	local currentAmmoText = '<font size="100"><font color = "rgb(255, 255, 255)">' .. self.tool.ammo.Value .. '</font></font>'
+	local currentMaxAmmoText = '<font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
+
+	newTween(UI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 1}).Completed:Wait()
+	UI.Ammo.Text = currentAmmoText .. currentMaxAmmoText
+	UI.FireMode.Text = self.tool.fireMode.Value:upper()
+	UI.Weapon.Text = script.Name:upper()
+	newTween(UI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 0})
+end
+
+function module:showDamageDealt(receiver, damageType, amount)
+	local root = receiver:FindFirstChild("HumanoidRootPart")
+	if root then
+		local newIndicator = self.UI.toolUI.DamageIndicator:Clone() do
+			newIndicator.TextLabel.Text = amount
+
+			for propertyName, propertyValue in pairs(Settings.UI.DamageIndicator[damageType]) do
+				newIndicator.TextLabel[propertyName] = propertyValue
+			end
+
+			newIndicator.Enabled = true
+			newIndicator.Parent = root 
+
+			local minOffset = Settings.UI.DamageIndicator.minOffset
+			local maxOffset = Settings.UI.DamageIndicator.minOffset
+			newIndicator.StudsOffset = Vector3.new(
+				randomnum(minOffset.X, maxOffset.X, 10),
+				randomnum(minOffset.Y, maxOffset.Y, 10),
+				0
+			)
+		end
+
+		playSound(self.sounds.hitSound, self.tool.handle)
+
+		Debris:AddItem(newIndicator, Settings.UI.DamageIndicator.maxduration)
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 0}).Completed:Wait()
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 1})
+	end	
+end
+
+function module:charDied()
+	disconnectCon(self.temp.connections)
+end
+
+-- // INIT \\ --
+
+function module.init(tool)
+	
+	-- create dictionary
+	
+	local self = {}
+	self = {
+		player = {
+			char = p.Character or p.CharacterAdded:Wait(),
+			hum = p.Character:WaitForChild("Humanoid"),
+		},
+		tool = {
+			tool = tool,
+			handle = tool:WaitForChild("Handle"),
+			ammo = waitForPath(tool, "Values.Ammo"),
+			fireMode = waitForPath(tool, "Values.FireMode"),
+			remotes = tool:WaitForChild("Remotes"),
+		},
+		anims = {
+			holdAnim = p.Character.Humanoid:LoadAnimation(waitForPath(script, "Animations.Hold")),
+			shootAnim = p.Character.Humanoid:LoadAnimation(script.Animations:WaitForChild("Shoot")),
+			reloadAnim = p.Character.Humanoid:LoadAnimation(script.Animations:WaitForChild("Reload")),
+		},		
+		UI = {
+			gunInfoUI = waitForPath(p.PlayerGui, "GunInfo.Frame"), 
+			toolUI = script:WaitForChild("UI"),
+		},
+		sounds = {
+			hitSound = tool.Handle:WaitForChild("Hit")
+		},		
+		temp = {
+			timeOfRecentFire = os.clock(),
+			mouse = nil,
+			expectingInput = nil,
+			isMouseDown = nil,
+
+			connections = {
+				currentOnInputBegan = nil,
+				currentOnInputEnded = nil,
+				currentOnStepped = nil,
+			}
+		}	
+	}
+	setmetatable(self, module)
+	
+	-- events
+	
+	self.tool.tool.Equipped:Connect(function(...)
+		self:onToolEquip(...)
+	end)
+	
+	self.tool.tool.Unequipped:Connect(function(...)
+		self:onToolUnequip(...)
+	end)
+	
+	self.tool.ammo.Changed:Connect(function()
+		self:updateUI()
+	end)
+	
+	self.tool.remotes:WaitForChild("DamageDealt").OnClientEvent:Connect(function(...)
+		self:showDamageDealt(...)
+	end)
+	
+	self.player.hum.Died:Connect(function()
+		self:charDied()
+	end)
+
+	-- compile
+
+	self:updateUI()
+	self.UI.gunInfoUI.Visible = true
+	self.UI.gunInfoUI.Position = Settings.UI.GunInfo.hiddenPos
+	
+end
+
+return module]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="Folder" referent="RBX8050D8DF10D0419EB80DD2D253D3C372">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Animations</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+						<Item class="Animation" referent="RBX90D7499369B74136BA5A411737EDA105">
+							<Properties>
+								<Content name="AnimationId"><url>rbxassetid://5956034919</url></Content>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<string name="Name">Shoot</string>
+								<int64 name="SourceAssetId">-1</int64>
+								<BinaryString name="Tags"></BinaryString>
+							</Properties>
+						</Item>
+						<Item class="Animation" referent="RBXD9E4AAB98C6B4987B7342F36B09F5318">
+							<Properties>
+								<Content name="AnimationId"><url>rbxassetid://5956036222</url></Content>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<string name="Name">Reload</string>
+								<int64 name="SourceAssetId">-1</int64>
+								<BinaryString name="Tags"></BinaryString>
+							</Properties>
+						</Item>
+						<Item class="Animation" referent="RBX643D4CE84FDB401AB54ADD118D6D85EE">
+							<Properties>
+								<Content name="AnimationId"><url>rbxassetid://5956033845</url></Content>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<string name="Name">Hold</string>
+								<int64 name="SourceAssetId">-1</int64>
+								<BinaryString name="Tags"></BinaryString>
+							</Properties>
+						</Item>
+					</Item>
+					<Item class="Folder" referent="RBX03E578C753214D839FD6469E8E94ACFF">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">UI</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+						<Item class="BillboardGui" referent="RBX359ABCB81F004E879DCA172514CCA6C6">
+							<Properties>
+								<bool name="Active">true</bool>
+								<Ref name="Adornee">null</Ref>
+								<bool name="AlwaysOnTop">true</bool>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<bool name="AutoLocalize">true</bool>
+								<bool name="ClipsDescendants">true</bool>
+								<float name="DistanceLowerLimit">0</float>
+								<float name="DistanceStep">0</float>
+								<float name="DistanceUpperLimit">-1</float>
+								<bool name="Enabled">false</bool>
+								<Vector3 name="ExtentsOffset">
+									<X>0</X>
+									<Y>0</Y>
+									<Z>0</Z>
+								</Vector3>
+								<Vector3 name="ExtentsOffsetWorldSpace">
+									<X>0</X>
+									<Y>0</Y>
+									<Z>0</Z>
+								</Vector3>
+								<float name="LightInfluence">0</float>
+								<float name="MaxDistance">INF</float>
+								<string name="Name">DamageIndicator</string>
+								<Ref name="PlayerToHideFrom">null</Ref>
+								<bool name="ResetOnSpawn">true</bool>
+								<Ref name="RootLocalizationTable">null</Ref>
+								<UDim2 name="Size">
+									<XS>0</XS>
+									<XO>50</XO>
+									<YS>0</YS>
+									<YO>25</YO>
+								</UDim2>
+								<Vector2 name="SizeOffset">
+									<X>0</X>
+									<Y>0</Y>
+								</Vector2>
+								<int64 name="SourceAssetId">-1</int64>
+								<Vector3 name="StudsOffset">
+									<X>1</X>
+									<Y>1</Y>
+									<Z>0</Z>
+								</Vector3>
+								<Vector3 name="StudsOffsetWorldSpace">
+									<X>0</X>
+									<Y>0</Y>
+									<Z>0</Z>
+								</Vector3>
+								<BinaryString name="Tags"></BinaryString>
+								<token name="ZIndexBehavior">1</token>
+							</Properties>
+							<Item class="TextLabel" referent="RBX6A7E8DD450904404BD4E24256A9AAA11">
+								<Properties>
+									<bool name="Active">false</bool>
+									<Vector2 name="AnchorPoint">
+										<X>0</X>
+										<Y>0</Y>
+									</Vector2>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<bool name="AutoLocalize">true</bool>
+									<token name="AutomaticSize">0</token>
+									<Color3 name="BackgroundColor3">
+										<R>1</R>
+										<G>1</G>
+										<B>1</B>
+									</Color3>
+									<float name="BackgroundTransparency">1</float>
+									<Color3 name="BorderColor3">
+										<R>0.105882362</R>
+										<G>0.164705887</G>
+										<B>0.207843155</B>
+									</Color3>
+									<token name="BorderMode">0</token>
+									<int name="BorderSizePixel">1</int>
+									<bool name="ClipsDescendants">false</bool>
+									<bool name="Draggable">false</bool>
+									<token name="Font">18</token>
+									<int name="LayoutOrder">0</int>
+									<float name="LineHeight">1</float>
+									<string name="Name">TextLabel</string>
+									<Ref name="NextSelectionDown">null</Ref>
+									<Ref name="NextSelectionLeft">null</Ref>
+									<Ref name="NextSelectionRight">null</Ref>
+									<Ref name="NextSelectionUp">null</Ref>
+									<UDim2 name="Position">
+										<XS>0</XS>
+										<XO>0</XO>
+										<YS>0</YS>
+										<YO>0</YO>
+									</UDim2>
+									<bool name="RichText">false</bool>
+									<Ref name="RootLocalizationTable">null</Ref>
+									<float name="Rotation">0</float>
+									<bool name="Selectable">false</bool>
+									<Ref name="SelectionImageObject">null</Ref>
+									<UDim2 name="Size">
+										<XS>1</XS>
+										<XO>0</XO>
+										<YS>1</YS>
+										<YO>0</YO>
+									</UDim2>
+									<token name="SizeConstraint">0</token>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<string name="Text">45</string>
+									<Color3 name="TextColor3">
+										<R>1</R>
+										<G>1</G>
+										<B>1</B>
+									</Color3>
+									<bool name="TextScaled">true</bool>
+									<float name="TextSize">30</float>
+									<Color3 name="TextStrokeColor3">
+										<R>0</R>
+										<G>0</G>
+										<B>0</B>
+									</Color3>
+									<float name="TextStrokeTransparency">0.699999988</float>
+									<float name="TextTransparency">0</float>
+									<token name="TextTruncate">0</token>
+									<bool name="TextWrapped">true</bool>
+									<token name="TextXAlignment">2</token>
+									<token name="TextYAlignment">1</token>
+									<bool name="Visible">true</bool>
+									<int name="ZIndex">1</int>
+								</Properties>
+							</Item>
+						</Item>
+					</Item>
+				</Item>
 			</Item>
 			<Item class="LocalScript" referent="RBX61EFF2AAFCC940529DB3486BA5F98F75">
 				<Properties>
@@ -15609,6 +16059,877 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 						</Properties>
 					</Item>
 				</Item>
+			</Item>
+		</Item>
+		<Item class="Tool" referent="RBXAB63C48112EB4B5C83C117A4B9658ECC">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="CanBeDropped">true</bool>
+				<bool name="Enabled">true</bool>
+				<CoordinateFrame name="Grip">
+					<X>-0.0323448181</X>
+					<Y>-0.525763512</Y>
+					<Z>-0.54352951</Z>
+					<R00>-0.992623985</R00>
+					<R01>0.121224619</R01>
+					<R02>-0.00150140526</R02>
+					<R10>0.121224627</R10>
+					<R11>0.992318392</R11>
+					<R12>-0.0246754605</R12>
+					<R20>-0.00150140142</R20>
+					<R21>-0.0246754605</R21>
+					<R22>-0.999694467</R22>
+				</CoordinateFrame>
+				<bool name="ManualActivationOnly">false</bool>
+				<string name="Name">AssultRifle</string>
+				<bool name="RequiresHandle">true</bool>
+				<int64 name="SourceAssetId">4842207161</int64>
+				<BinaryString name="Tags">V2VhcG9uc1N5c3RlbVdlYXBvbgBBc3N1bHRSaWZsZQBHdW4=</BinaryString>
+				<Content name="TextureId"><null></null></Content>
+				<string name="ToolTip"></string>
+			</Properties>
+			<Item class="Part" referent="RBX9F9B0CF402F14BF0B0B4A1878BD7EB91">
+				<Properties>
+					<bool name="Anchored">false</bool>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-24.0622711</X>
+						<Y>31.3953552</Y>
+						<Z>28.3725872</Z>
+						<R00>-0.00140200031</R00>
+						<R01>-0.0122989975</R01>
+						<R02>-0.999923944</R02>
+						<R10>0.0607290156</R10>
+						<R11>0.99807775</R11>
+						<R12>-0.0123614511</R12>
+						<R20>0.998153329</R20>
+						<R21>-0.0607417114</R21>
+						<R22>-0.000652399671</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">false</bool>
+					<bool name="CastShadow">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Handle</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">-127</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">1</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>0.5</X>
+						<Y>1</Y>
+						<Z>3</Z>
+					</Vector3>
+				</Properties>
+				<Item class="Attachment" referent="RBX8C751B3D28FB4D2FA2638D1DCFBC7932">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="CFrame">
+							<X>-0.0143146515</X>
+							<Y>0.257868767</Y>
+							<Z>2.30938721</Z>
+							<R00>1</R00>
+							<R01>2.23517418e-08</R01>
+							<R02>-1.38235777e-18</R02>
+							<R10>-2.23517418e-08</R10>
+							<R11>1</R11>
+							<R12>-6.18456397e-11</R12>
+							<R20>0</R20>
+							<R21>6.18456397e-11</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<string name="Name">GunFirePoint</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+				<Item class="ParticleEmitter" referent="RBX57B1A69156634449B9FBE103C4A3870F">
+					<Properties>
+						<Vector3 name="Acceleration">
+							<X>0</X>
+							<Y>-60</Y>
+							<Z>0</Z>
+						</Vector3>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<ColorSequence name="Color">0 0.196078 0.196078 0.196078 0 1 0.196078 0.196078 0.196078 0 </ColorSequence>
+						<float name="Drag">0</float>
+						<token name="EmissionDirection">5</token>
+						<bool name="Enabled">false</bool>
+						<NumberRange name="Lifetime">0.25 0.75 </NumberRange>
+						<float name="LightEmission">0</float>
+						<float name="LightInfluence">0</float>
+						<bool name="LockedToPart">false</bool>
+						<string name="Name">ImpactParticle</string>
+						<float name="Rate">120</float>
+						<NumberRange name="RotSpeed">0 0 </NumberRange>
+						<NumberRange name="Rotation">-180 180 </NumberRange>
+						<NumberSequence name="Size">0 0.5 0 0.982 0.3 0 1 0 0 </NumberSequence>
+						<int64 name="SourceAssetId">-1</int64>
+						<NumberRange name="Speed">30 30 </NumberRange>
+						<Vector2 name="SpreadAngle">
+							<X>30</X>
+							<Y>30</Y>
+						</Vector2>
+						<BinaryString name="Tags"></BinaryString>
+						<Content name="Texture"><url>rbxassetid://1082139505</url></Content>
+						<NumberSequence name="Transparency">0 0 0 1 0 0 </NumberSequence>
+						<float name="VelocityInheritance">0</float>
+						<float name="ZOffset">0</float>
+					</Properties>
+				</Item>
+				<Item class="Beam" referent="RBX312ADD4589EB44BAA920A279904F8394">
+					<Properties>
+						<Ref name="Attachment0">RBX3B69DFC96AF14906AEC0C91C643B511C</Ref>
+						<Ref name="Attachment1">RBX063D8A2F1ABC4E56A6A4318A44B89AD2</Ref>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<ColorSequence name="Color">0 0.839216 0.670588 0 0 1 1 0.917647 0.435294 0 </ColorSequence>
+						<float name="CurveSize0">0</float>
+						<float name="CurveSize1">0</float>
+						<bool name="Enabled">false</bool>
+						<bool name="FaceCamera">false</bool>
+						<float name="LightEmission">1</float>
+						<float name="LightInfluence">0</float>
+						<string name="Name">MuzzleFlash</string>
+						<int name="Segments">5</int>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<Content name="Texture"><url>rbxassetid://872910628</url></Content>
+						<float name="TextureLength">1</float>
+						<token name="TextureMode">0</token>
+						<float name="TextureSpeed">0</float>
+						<NumberSequence name="Transparency">0 0 0 1 0 0 </NumberSequence>
+						<float name="Width0">1</float>
+						<float name="Width1">1</float>
+						<float name="ZOffset">0</float>
+					</Properties>
+				</Item>
+				<Item class="Attachment" referent="RBX3B69DFC96AF14906AEC0C91C643B511C">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="CFrame">
+							<X>-0.495214462</X>
+							<Y>0.255348206</Y>
+							<Z>2.38897514</Z>
+							<R00>0.998153329</R00>
+							<R01>-0.0607291125</R01>
+							<R02>-0.0014020442</R02>
+							<R10>-0.0607417934</R10>
+							<R11>-0.99807775</R11>
+							<R12>-0.0122989956</R12>
+							<R20>-0.000652441988</R20>
+							<R21>0.0123614455</R21>
+							<R22>-0.999923468</R22>
+						</CoordinateFrame>
+						<string name="Name">MuzzleFlash0</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+				<Item class="Attachment" referent="RBX063D8A2F1ABC4E56A6A4318A44B89AD2">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="CFrame">
+							<X>0.504789352</X>
+							<Y>0.255580902</Y>
+							<Z>2.38872337</Z>
+							<R00>0.998153329</R00>
+							<R01>-0.0607291125</R01>
+							<R02>-0.0014020442</R02>
+							<R10>-0.0607417934</R10>
+							<R11>-0.99807775</R11>
+							<R12>-0.0122989956</R12>
+							<R20>-0.000652441988</R20>
+							<R21>0.0123614455</R21>
+							<R22>-0.999923468</R22>
+						</CoordinateFrame>
+						<string name="Name">MuzzleFlash1</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+				<Item class="SpotLight" referent="RBX97508489E32146E98454B58531486095">
+					<Properties>
+						<float name="Angle">120</float>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="Brightness">3</float>
+						<Color3 name="Color">
+							<R>1</R>
+							<G>0.917647064</G>
+							<B>0.435294122</B>
+						</Color3>
+						<bool name="Enabled">false</bool>
+						<token name="Face">5</token>
+						<string name="Name">MuzzleLight</string>
+						<float name="Range">20</float>
+						<bool name="Shadows">true</bool>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="Smoke" referent="RBX89B18113D38D46F39C7B9D18F2102238">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Color3 name="Color">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<bool name="Enabled">false</bool>
+						<string name="Name">Smoke</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="opacity_xml">0.00999999978</float>
+						<float name="riseVelocity_xml">1</float>
+						<float name="size_xml">0.100000001</float>
+					</Properties>
+				</Item>
+				<Item class="Weld" referent="RBX3C8BF17B3ACE4933ADB7327DA8694675">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="C0">
+							<X>6.67572021e-05</X>
+							<Y>-4.00543213e-05</Y>
+							<Z>0.124994278</Z>
+							<R00>1</R00>
+							<R01>-7.4505806e-09</R01>
+							<R02>5.82076609e-11</R02>
+							<R10>-7.4505806e-09</R10>
+							<R11>1</R11>
+							<R12>7.63975549e-11</R12>
+							<R20>0</R20>
+							<R21>8.36735126e-11</R21>
+							<R22>1.00000048</R22>
+						</CoordinateFrame>
+						<CoordinateFrame name="C1">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+							<R00>1</R00>
+							<R01>0</R01>
+							<R02>0</R02>
+							<R10>0</R10>
+							<R11>1</R11>
+							<R12>0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<bool name="Enabled">true</bool>
+						<string name="Name">Rifle</string>
+						<Ref name="Part0">RBX9F9B0CF402F14BF0B0B4A1878BD7EB91</Ref>
+						<Ref name="Part1">RBXE17E81B8BAA24D728D169C088E1BDB01</Ref>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="Weld" referent="RBX57386D9BAF35447F9E087FABE7FCEA72">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="C0">
+							<X>0.000102996826</X>
+							<Y>-0.449008942</Y>
+							<Z>0.196065903</Z>
+							<R00>1</R00>
+							<R01>-1.49011612e-08</R01>
+							<R02>5.82076609e-11</R02>
+							<R10>-1.49011612e-08</R10>
+							<R11>1</R11>
+							<R12>1.029548e-09</R12>
+							<R20>1.16415322e-10</R20>
+							<R21>9.09494702e-11</R21>
+							<R22>1.00000095</R22>
+						</CoordinateFrame>
+						<CoordinateFrame name="C1">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+							<R00>1</R00>
+							<R01>0</R01>
+							<R02>0</R02>
+							<R10>0</R10>
+							<R11>1</R11>
+							<R12>0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<bool name="Enabled">true</bool>
+						<string name="Name">Magazine</string>
+						<Ref name="Part0">RBX9F9B0CF402F14BF0B0B4A1878BD7EB91</Ref>
+						<Ref name="Part1">RBX7B001EC381B74213A4499A0C67DE4B9F</Ref>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="Weld" referent="RBX9C8ADFBFE8CE41C48EA0D6DB1E533C1C">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="C0">
+							<X>-0.86035347</X>
+							<Y>-12.625042</Y>
+							<Z>0.253314972</Z>
+							<R00>1</R00>
+							<R01>-1.49011612e-08</R01>
+							<R02>5.82076609e-11</R02>
+							<R10>-1.49011612e-08</R10>
+							<R11>1</R11>
+							<R12>1.029548e-09</R12>
+							<R20>1.16415322e-10</R20>
+							<R21>9.09494702e-11</R21>
+							<R22>1.00000095</R22>
+						</CoordinateFrame>
+						<CoordinateFrame name="C1">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+							<R00>1</R00>
+							<R01>0</R01>
+							<R02>0</R02>
+							<R10>0</R10>
+							<R11>1</R11>
+							<R12>0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<bool name="Enabled">true</bool>
+						<string name="Name">Bolt</string>
+						<Ref name="Part0">RBX9F9B0CF402F14BF0B0B4A1878BD7EB91</Ref>
+						<Ref name="Part1">RBX35FBAB58447D482E9CF702DC7A3A2493</Ref>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Folder" referent="RBX2AC48853801B4296906FA1127D5546A7">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Remotes</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="RemoteFunction" referent="RBX179A23C83B7048C6AD3A4C3CFE9155B6">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">MouseEvent</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="RemoteFunction" referent="RBX97D091F1C0494B4383B0BBBD6A5E44BF">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">ChangeStatus</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="RemoteEvent" referent="RBX4971870CD30248C38A56CAA691FDDE38">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">DamageDealt</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="RemoteFunction" referent="RBX8441406C4257487EBD89FBBA9C6854DD">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">ChangeFireMode</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Folder" referent="RBXF631EFD04C774E5F8E2EA306048D7A4F">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Sounds</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="Sound" referent="RBX0C829E1BEC064D029D712F9386F4E61A">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Equip</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://3834495137</url></Content>
+						<int64 name="SourceAssetId">3834495137</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">5</float>
+						<float name="xmlRead_MaxDistance_3">30</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX5E2EB3313B6842F79500D300B10C958E">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Hit</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://1489924400</url></Content>
+						<int64 name="SourceAssetId">144884872</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">1</float>
+						<float name="xmlRead_MaxDistance_3">10000</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX8D25FAA9C40744908F394A7C3BF20F42">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Jam</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://4980132174</url></Content>
+						<int64 name="SourceAssetId">4980132174</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">3</float>
+						<float name="xmlRead_MaxDistance_3">10000</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX83D902BD272749789D6D6C7D54738C19">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Unequip</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://3834495137</url></Content>
+						<int64 name="SourceAssetId">3834495137</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">5</float>
+						<float name="xmlRead_MaxDistance_3">30</float>
+					</Properties>
+					<Item class="PitchShiftSoundEffect" referent="RBX2036F6D29F9048139E13A477E629349E">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<bool name="Enabled">true</bool>
+							<string name="Name">PitchShiftSoundEffect</string>
+							<float name="Octave">0.899999976</float>
+							<int name="Priority">0</int>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+				</Item>
+				<Item class="Sound" referent="RBXFF302F3AD4FA41258A9789CCD38F6EC5">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Shoot</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://3806349898</url></Content>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">0.5</float>
+						<float name="xmlRead_MaxDistance_3">10000</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX555D1FC5A0C24CE19A05DE3A9FE07E32">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Reload</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://3821787597</url></Content>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">0.5</float>
+						<float name="xmlRead_MaxDistance_3">10000</float>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Folder" referent="RBXC1C0517DF4C94CFD902F4B98FB303F61">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Values</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="IntValue" referent="RBX44D3A5410BA74AB997C0D8BFDFD5E5BD">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Ammo</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<int64 name="Value">0</int64>
+					</Properties>
+				</Item>
+				<Item class="StringValue" referent="RBXA5EDDDFD3D7B40449239AC7339C7BE00">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">FireMode</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Value">semi</string>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="MeshPart" referent="RBXE17E81B8BAA24D728D169C088E1BDB01">
+				<Properties>
+					<bool name="Anchored">false</bool>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-24.1872559</X>
+						<Y>31.393774</Y>
+						<Z>28.3725739</Z>
+						<R00>-0.00140200043</R00>
+						<R01>-0.0122989975</R01>
+						<R02>-0.999923468</R02>
+						<R10>0.0607290231</R10>
+						<R11>0.99807775</R11>
+						<R12>-0.0123614455</R12>
+						<R20>0.998153329</R20>
+						<R21>-0.060741704</R21>
+						<R22>-0.00065239938</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">false</bool>
+					<bool name="CastShadow">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<bool name="DoubleSided">false</bool>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<bool name="HasJointOffset">false</bool>
+					<bool name="HasSkinnedMesh">false</bool>
+					<Vector3 name="InitialSize">
+						<X>0.292346358</X>
+						<Y>1.58758831</Y>
+						<Z>7.12295723</Z>
+					</Vector3>
+					<Vector3 name="JointOffset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<BinaryString name="LODData"></BinaryString>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">1088</token>
+					<Content name="MeshID"><url>rbxassetid://2492890820</url></Content>
+					<Content name="MeshId"><url>rbxassetid://2492890820</url></Content>
+					<string name="Name">Rifle</string>
+					<SharedString name="PhysicalConfigData">NFHmFkLdruzqiOXXxf84/Q==</SharedString>
+					<BinaryString name="PhysicsData"></BinaryString>
+					<float name="Reflectance">0</float>
+					<token name="RenderFidelity">1</token>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">-127</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="TextureID"><url>rbxassetid://2492896951</url></Content>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>0.194108516</X>
+						<Y>1.05410731</Y>
+						<Z>4.72941303</Z>
+					</Vector3>
+				</Properties>
+			</Item>
+			<Item class="MeshPart" referent="RBX7B001EC381B74213A4499A0C67DE4B9F">
+				<Properties>
+					<bool name="Anchored">false</bool>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-24.2528</X>
+						<Y>30.9447918</Y>
+						<Z>28.3998356</Z>
+						<R00>-0.0014020002</R00>
+						<R01>-0.0122989975</R01>
+						<R02>-0.999924898</R02>
+						<R10>0.0607290007</R10>
+						<R11>0.99807775</R11>
+						<R12>-0.0123614622</R12>
+						<R20>0.998153329</R20>
+						<R21>-0.0607417263</R21>
+						<R22>-0.000652400311</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">false</bool>
+					<bool name="CastShadow">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4283057993</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<bool name="DoubleSided">false</bool>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<bool name="HasJointOffset">false</bool>
+					<bool name="HasSkinnedMesh">false</bool>
+					<Vector3 name="InitialSize">
+						<X>0.15165633</X>
+						<Y>1.55700517</Y>
+						<Z>0.941493154</Z>
+					</Vector3>
+					<Vector3 name="JointOffset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<BinaryString name="LODData"></BinaryString>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">1088</token>
+					<Content name="MeshID"><url>rbxassetid://2492891824</url></Content>
+					<Content name="MeshId"><url>rbxassetid://2492891824</url></Content>
+					<string name="Name">Magazine</string>
+					<SharedString name="PhysicalConfigData">xMes/EWWoxhXwJbcmfYKrA==</SharedString>
+					<BinaryString name="PhysicsData"></BinaryString>
+					<float name="Reflectance">0</float>
+					<token name="RenderFidelity">1</token>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">-127</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="TextureID"><null></null></Content>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>0.100694895</X>
+						<Y>1.03380096</Y>
+						<Z>0.625120997</Z>
+					</Vector3>
+				</Properties>
+			</Item>
+			<Item class="MeshPart" referent="RBX35FBAB58447D482E9CF702DC7A3A2493">
+				<Properties>
+					<bool name="Anchored">false</bool>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-24.1590843</X>
+						<Y>18.7392025</Y>
+						<Z>28.2805233</Z>
+						<R00>-0.0014020002</R00>
+						<R01>-0.0122989975</R01>
+						<R02>-0.999924898</R02>
+						<R10>0.0607290007</R10>
+						<R11>0.99807775</R11>
+						<R12>-0.0123614622</R12>
+						<R20>0.998153329</R20>
+						<R21>-0.0607417263</R21>
+						<R22>-0.000652400311</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">false</bool>
+					<bool name="CastShadow">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4284702562</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<bool name="DoubleSided">false</bool>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<bool name="HasJointOffset">false</bool>
+					<bool name="HasSkinnedMesh">false</bool>
+					<Vector3 name="InitialSize">
+						<X>0.334550709</X>
+						<Y>0.190758198</Y>
+						<Z>0.845387936</Z>
+					</Vector3>
+					<Vector3 name="JointOffset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<BinaryString name="LODData"></BinaryString>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">1088</token>
+					<Content name="MeshID"><url>rbxassetid://2492892116</url></Content>
+					<Content name="MeshId"><url>rbxassetid://2492892116</url></Content>
+					<string name="Name">Bolt</string>
+					<SharedString name="PhysicalConfigData">wCP6Q/RhK7s4n/vnhkwycg==</SharedString>
+					<BinaryString name="PhysicsData"></BinaryString>
+					<float name="Reflectance">0</float>
+					<token name="RenderFidelity">1</token>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">-127</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="TextureID"><null></null></Content>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>0.22213085</X>
+						<Y>0.126657262</Y>
+						<Z>0.561310232</Z>
+					</Vector3>
+				</Properties>
 			</Item>
 		</Item>
 	</Item>
@@ -18310,6 +19631,378 @@ return typeof]]></ProtectedString>
 					</Properties>
 				</Item>
 			</Item>
+			<Item class="ModuleScript" referent="RBX67F4B607C86E4052815F21D53F5D72A9">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">AssultRifle</string>
+					<string name="ScriptGuid">{0913B6D4-15E2-4B69-8938-698E7B720C01}</string>
+					<ProtectedString name="Source"><![CDATA[local module = {}
+module.__index = module
+
+-- // VARIABLES \\ --
+
+local RNG = Random.new()
+local TAU = math.pi * 2	
+
+local Debris = game:GetService("Debris")
+
+local Settings = require(game.ReplicatedStorage.Settings[script.Name])
+local FastCast = require(script.Parent.FastCastRedux)
+local Table = require(script.Parent.FastCastRedux.Table)
+local PartCacheModule = require(script.Parent.PartCache)
+
+local Core = require(game.ServerScriptService.Core)
+local newThread = Core("newThread")
+local playSound = Core("playSound")
+
+local cosmeticBulletsFolder = workspace:FindFirstChild("CosmeticBulletsFolder") or Instance.new("Folder", workspace)
+cosmeticBulletsFolder.Name = "CosmeticBulletsFolder"
+
+-- // FUNCTIONS \\ --
+
+-- effects
+
+function module:playSmoke()
+	local newSmoke = self.VFX.smoke:Clone()
+	newSmoke.Enabled = true
+	newSmoke.Parent = self.tool.handle
+	Debris:AddItem(newSmoke, Settings.smokeDespawnDelay)
+
+	wait(Settings.smokeDuration)
+	newSmoke.Enabled = false
+end
+
+function module:playMuzzleLight()
+	local newMuzzleLight = self.VFX.muzzleLight:Clone()
+	newMuzzleLight.Enabled = true
+	newMuzzleLight.Parent = self.tool.handle
+	Debris:AddItem(newMuzzleLight, Settings.muzzleFlashTime)
+end
+
+function module:playMuzzleFlash()
+	local newMuzzleFlash = self.VFX.muzzleFlash:Clone()
+	newMuzzleFlash.Enabled = true
+	newMuzzleFlash.Parent = self.tool.handle
+	Debris:AddItem(newMuzzleFlash, Settings.muzzleFlashTime)
+end
+
+function module:playHitFX(part, position, normal)
+	local attachment = Instance.new("Attachment")
+	attachment.CFrame = CFrame.new(position, position + normal)
+	attachment.Parent = workspace.Terrain
+
+	local particle = self.VFX.impactParticle:Clone()
+	particle.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, part.Color),
+		ColorSequenceKeypoint.new(0.5, part.Color),
+		ColorSequenceKeypoint.new(1, part.Color)
+	})
+	
+	particle.Parent = attachment
+	Debris:AddItem(attachment, particle.Lifetime.Max)
+
+	particle.Enabled = true
+	wait(Settings.impactParticleDuration)
+	particle.Enabled = false
+end
+
+-- indirect
+
+function module:getCharFromHitPart(part)
+	local currentInstance = part
+	repeat
+		if currentInstance:FindFirstChildWhichIsA("Humanoid") then
+			return currentInstance
+		else
+			currentInstance = currentInstance.Parent
+		end
+	until currentInstance:IsA("Workspace")
+end
+
+function module:fire(direction, sender)	
+	-- random angles
+	local directionalCF = CFrame.new(Vector3.new(), direction)
+	local direction = (directionalCF * CFrame.fromOrientation(0, 0, RNG:NextNumber(0, TAU)) * CFrame.fromOrientation(math.rad(RNG:NextNumber(Settings.minBulletSpreadAngle, Settings.maxBulletSpreadAngle)), 0, 0)).LookVector
+
+	-- realistic bullet velocity
+	local root = self.tool.tool.Parent:WaitForChild("HumanoidRootPart", 1)
+	local myMovementSpeed = root.Velocity
+	local modifiedBulletSpeed = (direction * Settings.bulletSpeed) + myMovementSpeed
+
+	-- fire bullet
+	self.tool.ammo.Value -= Settings.bulletsPerShot
+	self.fastCast.caster:Fire(self.tool.firePointObj.WorldPosition, direction, modifiedBulletSpeed, self.fastCast.castBehavior, sender)
+	
+	newThread(playSound, self.sounds.shootSound, self.tool.handle)
+	
+	newThread(function()
+		self:playMuzzleFlash()
+	end)
+	
+	newThread(function()
+		self:playMuzzleLight()
+	end)
+	
+	newThread(function()
+		self:playSmoke()
+	end)	
+end
+
+-- events
+
+function module:onRayHit(cast, raycastResult, segmentVelocity, cosmeticBulletObject, sender)
+	local hitPart = raycastResult.Instance
+	local hitPoint = raycastResult.Position
+	local normal = raycastResult.Normal
+
+	-- check if hit
+	if hitPart then
+		local char = self:getCharFromHitPart(hitPart) or hitPart.Parent:FindFirstChildWhichIsA("Humanoid") and hitPart.Parent
+		if char then
+			local hum = char:FindFirstChildWhichIsA("Humanoid")
+			if hum then
+				local damageType, amount
+				if table.find({"Head"}, hitPart.Name) then
+					damageType = "head"
+					amount = Settings.headDamage
+					hum:TakeDamage(amount)
+				elseif table.find({"UpperTorso", "LowerTorso", "HumanoidRootPart"}, hitPart.Name) then
+					damageType = "torso"
+					amount = Settings.torsoDamage
+					hum:TakeDamage(amount)
+				else
+					damageType = "limb"
+					amount = Settings.limbDamage
+					hum:TakeDamage(amount)
+				end
+				self.tool.remotes.DamageDealt:FireClient(sender, hitPart.Parent, damageType, amount)
+			end
+		end
+		self:playHitFX(hitPart, hitPoint, normal)
+	end
+end
+
+function module:onRayUpdated(cast, segmentOrigin, segmentDirection, length, segmentVelocity, cosmeticBulletObject)
+	if not cosmeticBulletObject then 
+		return 
+	end
+
+	-- adjust bullet size
+	local bulletVelocity = (math.abs(segmentVelocity.X) + math.abs(segmentVelocity.Y) + math.abs(segmentVelocity.Z))
+	cosmeticBulletObject.Size = Vector3.new(cosmeticBulletObject.Size.X, cosmeticBulletObject.Size.Y, bulletVelocity / Settings.bulletLengthMultiplier)
+
+	-- adjust bullet pos
+	local bulletLength = cosmeticBulletObject.Size.Z / 2
+	local baseCFrame = CFrame.new(segmentOrigin, segmentOrigin + segmentDirection)
+	cosmeticBulletObject.CFrame = baseCFrame * CFrame.new(0, 0, -(length - bulletLength))
+end
+
+function module:onRayTerminated(cast)
+	local cosmeticBullet = cast.RayInfo.CosmeticBulletObject
+	if cosmeticBullet then
+		if self.fastCast.castBehavior.CosmeticBulletProvider then
+			self.fastCast.castBehavior.CosmeticBulletProvider:ReturnPart(cosmeticBullet)
+		else
+			cosmeticBullet:Destroy()
+		end
+	end
+end
+
+function module:onMouseEventFired(p, mousePoint)
+
+	-- debounce	
+	if not self.temp.canFire or os.clock() - self.temp.timeOfRecentFire < 60 / Settings.fireRate then
+		playSound(self.sounds.jamSound, self.tool.handle)
+		return false, "GUN_JAMMED"
+	end
+	self.temp.timeOfRecentFire = os.clock()
+	self.temp.canFire = false	
+
+	-- check ammo
+	if self.tool.ammo.Value <= 0 then
+		self.temp.canFire = true
+		playSound(self.sounds.jamSound, self.tool.handle)
+		return false, "NO_AMMO"
+	end
+
+	-- check if gun is equipped
+	if self.tool.tool.Parent:IsA("Backpack") then 
+		self.temp.canFire = true
+		return false, "TOOL_NOT_EQUIPPED"
+	end	
+
+	-- fire gun
+	local mouseDirection = (mousePoint - self.tool.firePointObj.WorldPosition).Unit
+
+	local bulletsToShoot
+	if self.tool.fireMode.Value == "burst" then
+		bulletsToShoot = self.tool.ammo.Value >= Settings.burstBulletsPerShot and Settings.burstBulletsPerShot or self.tool.ammo.Value
+	else
+		bulletsToShoot = 1
+	end
+
+	for i = 1, bulletsToShoot do
+		self:fire(mouseDirection, p)
+
+		if self.tool.fireMode.Value == "burst" then
+			wait(Settings.burstShoootDelay)
+		end	
+	end
+
+	-- end debounce
+	self.temp.canFire = true
+	return true, "FIRED"
+end
+
+function module:onChangeStatusFired(p, status)
+	if status == "reload" then
+		self.temp.canFire = false
+		self.sounds.reloadSound:Play()
+		wait(Settings.reloadTime)
+		self.tool.ammo.Value = Settings.maxAmmo
+		self.temp.canFire = true
+		return true, "GUN_RELOADED"
+	elseif status == "equip" then
+		self.temp.canFire = true
+		self.fastCast.castParams.FilterDescendantsInstances = {self.tool.tool.Parent, self.fastCast.cosmeticBulletsFolder}
+		self.sounds.equipSound:Play()
+		return true, "GUN_EQUIPPED"
+	elseif status == "unequip" then
+		self.temp.canFire = false
+		self.sounds.unequipSound:Play()
+		return true, "GUN_UNEQUIPPED"
+	end
+end
+
+function module:onChangeFireMode(p)
+	local fireModes = Settings.fireMode
+	local oldFireModeIndex = table.find(fireModes, self.tool.fireMode.Value)
+	local newFireMode
+
+	if oldFireModeIndex == #fireModes and oldFireModeIndex ~= 1 then
+		newFireMode = fireModes[1]
+	elseif oldFireModeIndex < #fireModes then
+		newFireMode = fireModes[oldFireModeIndex + 1]
+	end
+	if newFireMode then
+		self.tool.fireMode.Value = newFireMode
+		return newFireMode
+	end
+end
+
+-- // INIT \\ --
+
+function module.init(tool)
+	
+	-- create dictionary
+	
+	local self = {}
+	self = {
+		tool = {
+			tool = tool,
+			handle = tool.Handle,
+			firePointObj = tool.Handle.GunFirePoint,
+			remotes = tool.Remotes,
+			values = tool.Values,
+			ammo = tool.Values.Ammo,
+			fireMode = tool.Values.FireMode
+		},
+		sounds = {},
+		VFX = {
+			impactParticle = tool.Handle.ImpactParticle,
+			muzzleFlash = tool.Handle.MuzzleFlash,
+			muzzleLight = tool.Handle.MuzzleLight,
+			smoke = tool.Handle.Smoke
+		},
+		temp = {
+			canFire = true,
+			timeOfRecentFire = os.clock(),	
+		},
+		fastCast = {
+			caster = FastCast.new(),
+			cosmeticBullet = nil,
+			castParams = nil,
+			castBehavior = nil,
+		}
+	}
+	setmetatable(self, module)
+	
+	-- set ammo
+	
+	self.tool.ammo.Value = Settings.maxAmmo
+
+	-- sets sounds
+	for _,sound in pairs(tool.Sounds:GetChildren()) do
+		sound.Parent = self.tool.handle
+		self.sounds[sound.Name:sub(1, 1):lower() .. sound.Name:sub(2, #sound.Name) .. "Sound"] = sound
+	end
+	-- creates bullet
+	
+	self.fastCast.cosmeticBullet = Instance.new("Part")
+	for propertyName, propertyValue in pairs(Settings.bulletProps) do
+		self.fastCast.cosmeticBullet[propertyName] = propertyValue
+	end
+
+	-- new raycast paras
+	
+	self.fastCast.castParams = RaycastParams.new()
+	for propertyName, propertyValue in pairs(Settings.raycastParas) do
+		self.fastCast.castParams[propertyName] = propertyValue
+	end
+
+	-- data packets
+	
+	self.fastCast.castBehavior = FastCast.newBehavior()
+	self.fastCast.castBehavior.RaycastParams = self.fastCast.castParams
+	self.fastCast.castBehavior.MaxDistance = Settings.bulletMaxDist
+
+	-- part cache
+	
+	local cosmeticPartProvider = PartCacheModule.new(self.fastCast.cosmeticBullet, 100, cosmeticBulletsFolder)
+	self.fastCast.castBehavior.CosmeticBulletProvider = cosmeticPartProvider
+	self.fastCast.castBehavior.CosmeticBulletContainer = cosmeticPartProvider
+	self.fastCast.castBehavior.Acceleration = Settings.bulletGravity
+	self.fastCast.castBehavior.AutoIgnoreContainer = false
+	
+	-- events
+	
+	self.fastCast.caster.RayHit:Connect(function(...)
+		self:onRayHit(...)
+	end)
+	
+	self.fastCast.caster.LengthChanged:Connect(function(...)
+		self:onRayUpdated(...)
+	end)
+	
+	self.fastCast.caster.CastTerminating:Connect(function(...)
+		self:onRayTerminated(...)
+	end)
+	
+	self.tool.remotes.MouseEvent.OnServerInvoke = function(...)
+		self:onMouseEventFired(...)
+	end
+	
+	self.tool.remotes.ChangeStatus.OnServerInvoke = function(...)
+		return self:onChangeStatusFired(...)
+	end
+
+	self.tool.remotes.ChangeFireMode.OnServerInvoke = function(...)
+		return self:onChangeFireMode(...)
+	end
+
+end
+
+-- // COMPILE \\ --
+
+FastCast.DebugLogging = Settings.willDebug
+FastCast.VisualizeCasts = Settings.willDebug
+
+return module]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
 		</Item>
 		<Item class="Script" referent="RBXFC63455869C94254BCC13CF6895518D8">
 			<Properties>
@@ -18421,6 +20114,27 @@ collection(NPC_TAG, init)
 					</Properties>
 				</Item>
 			</Item>
+			<Item class="Folder" referent="RBX95EC52C635E243A69DBDE1C66884480A">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">AssultRifle</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="Color3Value" referent="RBXC78DC2DB25D949A1A8C0C9D022692634">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Color</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<Color3 name="Value">
+							<R>0.489025444</R>
+							<G>0.0175800547</G>
+							<B>0.665098011</B>
+						</Color3>
+					</Properties>
+				</Item>
+			</Item>
 		</Item>
 	</Item>
 	<Item class="ReplicatedStorage" referent="RBXF7C8BA6C025B4CC580EE364CAC591D0C">
@@ -18450,7 +20164,7 @@ collection(NPC_TAG, init)
 	
 	-- gun
 	mouseIcon = "rbxassetid://131581677",
-	fireMode = {"safety", "semi"}, -- array: safety, semi, burst, auto
+	fireMode = {"semi", "safety"}, -- array: safety, semi, burst, auto
 	bulletsPerShot = 1,
 	burstBulletsPerShot = 3,
 	burstShoootDelay = 0.1,
@@ -18468,6 +20182,109 @@ collection(NPC_TAG, init)
 	-- bullets
 	bulletSpeed = 1500, -- studs/sec
 	bulletMaxDist = 55, -- studs
+	bulletGravity = Vector3.new(0, -workspace.Gravity, 0),
+	bulletLengthMultiplier = 200,
+	
+	-- effects
+	muzzleFlashTime = 0.1,
+	impactParticleDuration = 0.05,
+	smokeDuration = 3,
+	smokeDespawnDelay = 5,
+	
+	-- UI
+	UI = {
+		DamageIndicator = {
+			head = {
+				TextColor3 = Color3.fromRGB(255, 255, 150),
+				TextStrokeColor3 = Color3.fromRGB(55, 45, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
+			},
+			torso = {
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
+			},
+			limb = {
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
+			},
+			maxduration = 2,
+			tweenInfo = TweenInfo.new(0.5),
+			minOffset = Vector3.new(-6, -6, 0),
+			maxOffset = Vector3.new(6, 6, 0)
+		},
+		GunInfo = {
+			hiddenPos = UDim2.new(1, -420, 1, 0),
+			shownPos = UDim2.new(1, -420, 1, -140),
+			tweenInfo = TweenInfo.new(0.3)
+		},
+		textFlashTweenInfo = TweenInfo.new(0.1)
+	},
+	
+	-- bullet props
+	bulletProps = {
+		Material = Enum.Material.Neon,
+		Color = Color3.fromRGB(255, 123, 123),
+		CanCollide = false,
+		Anchored = true,
+		Size = Vector3.new(0.05, 0.05, 1)
+	},
+	
+	-- raycast paras
+	raycastParas = {
+		IgnoreWater = true,
+		FilterType = Enum.RaycastFilterType.Blacklist,
+		FilterDescendantsInstances = {}
+	},
+	
+	-- keybinds
+	keybinds = {
+		shoot = Enum.UserInputType.MouseButton1,
+		reload = Enum.KeyCode.R,
+		fireMode = Enum.KeyCode.V
+	}
+}
+
+return Settings]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXC7A9DE0164184EBEB125CEE8D226460F">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">AssultRifle</string>
+					<string name="ScriptGuid">{2ECA2CC1-B920-46FC-8F1C-F6001262AEBD}</string>
+					<ProtectedString name="Source"><![CDATA[local Settings = {
+	
+	-- debug
+	willDebug = false,
+	
+	-- gun
+	mouseIcon = "rbxassetid://131581677",
+	fireMode = {"auto", "burst", "semi", "safety"}, -- array: safety, semi, burst, auto
+	bulletsPerShot = 1,
+	burstBulletsPerShot = 3,
+	burstShoootDelay = 0.1,
+	maxAmmo = 30,
+	reloadTime = 3,
+	minBulletSpreadAngle = 0, -- between 0 and 180, in degrees
+	maxBulletSpreadAngle = 0, -- between 0 and 180, in degrees
+	fireRate = 900,
+	
+	-- damage
+	headDamage = 35,
+	torsoDamage = 28,
+	limbDamage = 20,
+	
+	-- bullets
+	bulletSpeed = 2800, -- studs/sec
+	bulletMaxDist = 165, -- studs
 	bulletGravity = Vector3.new(0, -workspace.Gravity, 0),
 	bulletLengthMultiplier = 200,
 	
@@ -19081,6 +20898,906 @@ AAkAAAADAAAAAwAAAAkAAAAKAAAAAwAAAAoAAAAEAAAABAAAAAoAAAALAAAABAAAAAsAAAAF
 AAAABQAAAAsAAAAMAAAABQAAAAwAAAAGAAAABwAAAAwAAAANAAAACAAAAA4AAAAJAAAACQAA
 AA4AAAAPAAAACQAAAA8AAAAKAAAACgAAAA8AAAALAAAACwAAAA8AAAAQAAAACwAAABAAAAAN
 AAAACwAAAA0AAAAMAAAADQAAABAAAAAPAAAADQAAAA8AAAAOAAAA</SharedString>
+		<SharedString md5="NFHmFkLdruzqiOXXxf84/Q==">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
+AAAkAAAAKgAAAAYAAAAqAAAALQAAAAYAAAAtAAAAKwAAAAYAAAArAAAAJgAAAAYAAAAmAAAA
+HwAAAAYAAAAfAAAAFwAAAAYAAAAXAAAAEAAAAAYAAAAQAAAADwAAAAYAAAAPAAAADgAAAAYA
+AAAOAAAABwAAAAcAAAAOAAAACAAAAAgAAAAOAAAADwAAAAgAAAAPAAAAEAAAAAgAAAAQAAAA
+EQAAAAkAAAARAAAAGAAAAAkAAAAYAAAAEgAAAAoAAAATAAAAGwAAAAoAAAAbAAAAFAAAAAsA
+AAAVAAAAFgAAAAsAAAAWAAAADAAAABAAAAAXAAAAEQAAABEAAAAXAAAAGAAAABIAAAAYAAAA
+IAAAABIAAAAgAAAAGQAAABMAAAAaAAAAIwAAABMAAAAjAAAAGwAAABQAAAAbAAAAHAAAABQA
+AAAcAAAAHQAAABQAAAAdAAAAHgAAABcAAAAfAAAAIAAAABcAAAAgAAAAGAAAABkAAAAgAAAA
+JwAAABkAAAAnAAAAIQAAABoAAAAiAAAAKQAAABoAAAApAAAAIwAAABsAAAAjAAAAJAAAABsA
+AAAkAAAAJQAAABsAAAAlAAAAHAAAAB8AAAAmAAAAIAAAACAAAAAmAAAAJwAAACEAAAAnAAAA
+LAAAACEAAAAsAAAAKAAAACIAAAAoAAAALAAAACIAAAAsAAAAKQAAACMAAAApAAAAKgAAACMA
+AAAqAAAAJAAAACYAAAArAAAALAAAACYAAAAsAAAAJwAAACkAAAAsAAAAKwAAACkAAAArAAAA
+LQAAACkAAAAtAAAAKgAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAA
+gD+HAAAABAAAAKbtpT15N8M+iPEsQFremj1iVLU+iPEsQKbtpT15N8M+z/MqQFremj0KHNE+
+iPEsQAEBiz15N8M+DDI5QCUjhz2I8a0+iPEsQFremj1iVLU+z/MqQMH9gT2a57c+DDI5QFre
+mj0KHNE+z/MqQDKlaz06FtM+DDI5QMH9gT3RiM4+DDI5QLAofT0Isds+z/MqQMa7dj0Z49w+
+iPEsQEaxUD08Tq4+DDI5QIRtTD2I8a0+DDI5QCUjhz2I8a0+z/MqQEaxUD0+H9g+DDI5QMa7
+dj0Z49w+z/MqQJp0GD2rpeY+z/MqQDch87yI8a0+DDI5QGJpO72I8a0+z/MqQIFgKD0Af9s+
+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
+DgAAAAAAAAAOAAAAEgAAAAAAAAASAAAAFgAAAAAAAAAWAAAAGgAAAAAAAAAaAAAAHgAAAAAA
+AAAeAAAAIgAAAAAAAAAiAAAAKAAAAAAAAAAoAAAALQAAAAAAAAAtAAAAMAAAAAAAAAAwAAAA
+LwAAAAAAAAAvAAAAKwAAAAAAAAArAAAAKQAAAAAAAAApAAAAJAAAAAAAAAAkAAAAIAAAAAAA
+AAAgAAAAHAAAAAAAAAAcAAAAGAAAAAAAAAAYAAAAFAAAAAAAAAAUAAAAEAAAAAAAAAAQAAAA
+DAAAAAAAAAAMAAAACgAAAAAAAAAKAAAABQAAAAAAAAAFAAAAAQAAAAEAAAAFAAAABgAAAAEA
+AAAGAAAABwAAAAEAAAAHAAAAAgAAAAIAAAAHAAAABgAAAAIAAAAGAAAACwAAAAIAAAALAAAA
+DwAAAAIAAAAPAAAAEwAAAAIAAAATAAAAFwAAAAIAAAAXAAAAGwAAAAIAAAAbAAAAHwAAAAIA
+AAAfAAAAIwAAAAIAAAAjAAAAJQAAAAIAAAAlAAAAKgAAAAIAAAAqAAAALgAAAAIAAAAuAAAA
+LAAAAAIAAAAsAAAAJwAAAAIAAAAnAAAAJgAAAAIAAAAmAAAAIQAAAAIAAAAhAAAAHQAAAAIA
+AAAdAAAAGQAAAAIAAAAZAAAAFQAAAAIAAAAVAAAAEQAAAAIAAAARAAAADQAAAAIAAAANAAAA
+CAAAAAIAAAAIAAAAAwAAAAMAAAAIAAAACQAAAAMAAAAJAAAABAAAAAUAAAAKAAAABgAAAAYA
+AAAKAAAADAAAAAYAAAAMAAAACwAAAAgAAAANAAAADgAAAAgAAAAOAAAACQAAAAsAAAAMAAAA
+DwAAAAwAAAAQAAAADwAAAA0AAAARAAAAEgAAAA0AAAASAAAADgAAAA8AAAAQAAAAFAAAAA8A
+AAAUAAAAEwAAABEAAAAVAAAAFgAAABEAAAAWAAAAEgAAABMAAAAUAAAAGAAAABMAAAAYAAAA
+FwAAABUAAAAZAAAAGgAAABUAAAAaAAAAFgAAABcAAAAYAAAAHAAAABcAAAAcAAAAGwAAABkA
+AAAdAAAAHgAAABkAAAAeAAAAGgAAABsAAAAcAAAAHwAAABwAAAAgAAAAHwAAAB0AAAAhAAAA
+HgAAAB4AAAAhAAAAIgAAAB8AAAAgAAAAIwAAACAAAAAkAAAAJQAAACAAAAAlAAAAIwAAACEA
+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
+AAAHAAAACAAAAAEAAAAIAAAACQAAAAEAAAAJAAAACgAAAAEAAAAKAAAACwAAAAEAAAALAAAA
+DAAAAAEAAAAMAAAAAgAAAAIAAAAMAAAACwAAAAIAAAALAAAACgAAAAIAAAAKAAAAEgAAAAIA
+AAASAAAAHgAAAAIAAAAeAAAAJwAAAAIAAAAnAAAAJgAAAAIAAAAmAAAAJQAAAAIAAAAlAAAA
+MAAAAAIAAAAwAAAANgAAAAIAAAA2AAAAOgAAAAIAAAA6AAAAMwAAAAIAAAAzAAAAMgAAAAIA
+AAAyAAAALQAAAAIAAAAtAAAAKAAAAAIAAAAoAAAAHwAAAAIAAAAfAAAAFgAAAAIAAAAWAAAA
+DQAAAAIAAAANAAAABAAAAAIAAAAEAAAAAwAAAAQAAAANAAAABQAAAAUAAAANAAAAFgAAAAUA
+AAAWAAAADgAAAAUAAAAOAAAADwAAAAUAAAAPAAAABgAAAAYAAAAPAAAAGgAAAAYAAAAaAAAA
+GQAAAAYAAAAZAAAAGAAAAAYAAAAYAAAAFwAAAAYAAAAXAAAAIQAAAAYAAAAhAAAALAAAAAYA
+AAAsAAAAKwAAAAYAAAArAAAAKgAAAAYAAAAqAAAANAAAAAYAAAA0AAAAOQAAAAYAAAA5AAAA
+OAAAAAYAAAA4AAAANwAAAAYAAAA3AAAANQAAAAYAAAA1AAAALgAAAAYAAAAuAAAAIwAAAAYA
+AAAjAAAAIgAAAAYAAAAiAAAAHAAAAAYAAAAcAAAAFQAAAAYAAAAVAAAAFAAAAAYAAAAUAAAA
+EwAAAAYAAAATAAAAEAAAAAYAAAAQAAAACAAAAAYAAAAIAAAABwAAAAgAAAAQAAAACQAAAAkA
+AAARAAAAHgAAAAkAAAAeAAAAEgAAAAkAAAASAAAACgAAAAkAAAAQAAAAEwAAAAkAAAATAAAA
+FAAAAAkAAAAUAAAAFQAAAAkAAAAVAAAAEQAAAA4AAAAXAAAAGAAAAA4AAAAYAAAAGQAAAA4A
+AAAZAAAAGgAAAA4AAAAaAAAADwAAAA4AAAAWAAAAHwAAAA4AAAAfAAAAGwAAAA4AAAAbAAAA
+FwAAABEAAAAVAAAAHAAAABEAAAAcAAAAHQAAABEAAAAdAAAAJwAAABEAAAAnAAAAHgAAABcA
+AAAbAAAAIAAAABcAAAAgAAAAIQAAABsAAAAfAAAAKAAAABsAAAAoAAAAIAAAABwAAAAiAAAA
+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
+CAAAAAEAAAAIAAAACQAAAAEAAAAJAAAACgAAAAIAAAALAAAAEwAAAAIAAAATAAAADAAAAAMA
+AAANAAAADgAAAAMAAAAOAAAABAAAAAQAAAAOAAAAFwAAAAQAAAAXAAAAHgAAAAQAAAAeAAAA
+JQAAAAQAAAAlAAAAKgAAAAQAAAAqAAAAJwAAAAQAAAAnAAAAJgAAAAQAAAAmAAAAHwAAAAQA
+AAAfAAAAGAAAAAQAAAAYAAAAEwAAAAQAAAATAAAAEgAAAAQAAAASAAAAEQAAAAQAAAARAAAA
+EAAAAAQAAAAQAAAADwAAAAQAAAAPAAAACQAAAAQAAAAJAAAACAAAAAQAAAAIAAAABwAAAAQA
+AAAHAAAABgAAAAQAAAAGAAAABQAAAAkAAAAPAAAACwAAAAkAAAALAAAACgAAAAsAAAAPAAAA
+EAAAAAsAAAAQAAAAEQAAAAsAAAARAAAAEgAAAAsAAAASAAAAEwAAAAwAAAATAAAAGAAAAAwA
+AAAYAAAAFAAAAA0AAAAVAAAAFgAAAA0AAAAWAAAAFwAAAA0AAAAXAAAADgAAABQAAAAYAAAA
+HwAAABQAAAAfAAAAGQAAABQAAAAZAAAAGgAAABUAAAAbAAAAFgAAABYAAAAbAAAAHAAAABYA
+AAAcAAAAIwAAABYAAAAjAAAAHQAAABYAAAAdAAAAHgAAABYAAAAeAAAAFwAAABkAAAAfAAAA
+JgAAABkAAAAmAAAAIAAAABkAAAAgAAAAKAAAABkAAAAoAAAAIQAAABkAAAAhAAAAIgAAABkA
+AAAiAAAAGgAAAB0AAAAkAAAAJQAAAB0AAAAlAAAAHgAAAB0AAAAjAAAAJAAAACAAAAAmAAAA
+JwAAACAAAAAnAAAAJAAAACAAAAAkAAAAKAAAACMAAAApAAAAJAAAACQAAAAnAAAAKgAAACQA
+AAAqAAAAJQAAACQAAAApAAAAKwAAACQAAAArAAAAKAAAABAAAAAAAAAAAAAAAAAAAAAAAAAA
+EAAAAAAAAAAAAAAAAAAAAAAAgD9aAAAABAAAANSvRT0S8/E+AMC2N/KNEj4S8/E+AMC2N9Sv
+RT0S8/E+qNsePLAwhb0WGR0/AMC2NxmiDz4GGgE/AMC2N0qTEj6h+PE+juljPvKNEj4S8/E+
+cMDtPNSvRT2h+PE+juljPrAwhb0WGR0/RO9jPjAeGb3DHSo/AMC2N2yOBj77vQs/AMC2N9gB
+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
+Kox+vWbPZD7c0O0/HLzLu+htgj6WNgBAKvARvCS8hT6WNgBAmCJVvD3Mij6WNgBAsBgxvWji
+tz6WNgBAXAE2vbrxuj6WNgBAkJwlPMQdUD5E7+M/YHnruqx7gT6WNgBAXqhmvZAjYz5E7+M/
+Kox+vWbPZD5E7+M/CAEAAAAAAAABAAAADQAAAAAAAAANAAAAAgAAAAAAAAACAAAAFQAAAAAA
+AAAVAAAAAwAAAAAAAAADAAAABAAAAAAAAAAEAAAABQAAAAAAAAAFAAAABgAAAAAAAAAGAAAA
+BwAAAAAAAAAHAAAACAAAAAAAAAAIAAAACQAAAAAAAAAJAAAACgAAAAAAAAAKAAAACwAAAAAA
+AAALAAAADAAAAAAAAAAMAAAAAQAAAAEAAAAMAAAADgAAAAEAAAAOAAAADwAAAAEAAAAPAAAA
+EAAAAAEAAAAQAAAAEQAAAAEAAAARAAAAEgAAAAEAAAASAAAAEwAAAAEAAAATAAAAFAAAAAEA
+AAAUAAAAHwAAAAEAAAAfAAAADQAAAAIAAAANAAAAHwAAAAIAAAAfAAAAKgAAAAIAAAAqAAAA
+LAAAAAIAAAAsAAAALQAAAAIAAAAtAAAAIwAAAAIAAAAjAAAAFQAAAAMAAAAVAAAAIwAAAAMA
+AAAjAAAAFgAAAAMAAAAWAAAAFwAAAAMAAAAXAAAAGAAAAAMAAAAYAAAAGQAAAAMAAAAZAAAA
+GgAAAAMAAAAaAAAAGwAAAAMAAAAbAAAAHAAAAAMAAAAcAAAAHQAAAAMAAAAdAAAAHgAAAAMA
+AAAeAAAABAAAAAQAAAAeAAAAHQAAAAQAAAAdAAAAHAAAAAQAAAAcAAAAGwAAAAQAAAAbAAAA
+GgAAAAQAAAAaAAAAGQAAAAQAAAAZAAAAGAAAAAQAAAAYAAAAFwAAAAQAAAAXAAAAKQAAAAQA
+AAApAAAAKAAAAAQAAAAoAAAAJwAAAAQAAAAnAAAAJgAAAAQAAAAmAAAAJQAAAAQAAAAlAAAA
+KwAAAAQAAAArAAAAIQAAAAQAAAAhAAAAIAAAAAQAAAAgAAAAEwAAAAQAAAATAAAAEgAAAAQA
+AAASAAAAEQAAAAQAAAARAAAAEAAAAAQAAAAQAAAADwAAAAQAAAAPAAAADgAAAAQAAAAOAAAA
+DAAAAAQAAAAMAAAACwAAAAQAAAALAAAACgAAAAQAAAAKAAAACQAAAAQAAAAJAAAACAAAAAQA
+AAAIAAAABwAAAAQAAAAHAAAABgAAAAQAAAAGAAAABQAAABMAAAAgAAAAFAAAABQAAAAgAAAA
+IQAAABQAAAAhAAAAIgAAABQAAAAiAAAAKgAAABQAAAAqAAAAHwAAABYAAAAkAAAAJQAAABYA
+AAAlAAAAJgAAABYAAAAmAAAAJwAAABYAAAAnAAAAKAAAABYAAAAoAAAAKQAAABYAAAApAAAA
+FwAAABYAAAAjAAAALQAAABYAAAAtAAAAJAAAACEAAAArAAAAJAAAACEAAAAkAAAAIgAAACIA
+AAAkAAAALAAAACIAAAAsAAAAKgAAACQAAAAtAAAALAAAACQAAAArAAAAJQAAABAAAAAAAAAA
+AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAgD+HAAAABAAAAIy+470w9/E+D27aPn6x
+470w9/E+KQm1Pn6x470w9/E+RO/jPn6x472mGRg/RO/jPn6x472HpiM/aezjPoy+4724vgs/
+KQm1Poy+473CAf4+KQm1Pvsohb1eHR0/+vRjPpGtRT0w9/E+RO9jPpqLBj4w9/E+RO/jPkJd
+tr3l4Co/RO/jPn6x472HpiM/KQm1Pv/ji73IODk/aezjPuPloL3EDkM/HebPPuPloL1fI0M/
+/HPEPozIg70YNks/BsiWPgAgGb0lHSo/+vRjPspnUT1cdxY/RO9jPp2NEj4w9/E+RO9jPiSU
+Ej4w9/E+KQm1PpqLBj6HpiM/RO/jPv/ji73AozE/RO/jPiq5Dr2UtT8/aezjPqZYyj3EDkM/
+HebPPozIg71m/Eo/+v6fPkEurT0YNks/BsiWPvAUv7qcbDA/+vRjPsR1uruGAzA/+vRjPgoe
+crzdIC8/+vRjPpQ8grwEBC8/+vRjPu5TsTycbDA/+vRjPtI4Dz3dIC8/+vRjPprPEz0EBC8/
++vRjPk4vSz3U7is/+vRjPlDRaz0lHSo/+vRjPs/RED4UqPs+RO9jPpqLBj6HpiM/KQm1PqZY
+yj1fI0M//HPEPrRJtT3IODk/aezjPvCd4j1yayo/RO/jPpY9JL3cGjc/RO/jPnlqYT2UtT8/
+aezjPkEurT1m/Eo/+v6fPpqLBj64vgs/+vRjPg+fDz6uGgE/+vRjPgIBAAAAAAAAAQAAAAgA
+AAAAAAAACAAAABIAAAAAAAAAEgAAABMAAAAAAAAAEwAAAAkAAAAAAAAACQAAAAIAAAAAAAAA
+AgAAAAMAAAAAAAAAAwAAAAQAAAAAAAAABAAAAAUAAAAAAAAABQAAAAYAAAAAAAAABgAAAAEA
+AAABAAAABgAAAAcAAAABAAAABwAAAAgAAAACAAAACQAAABQAAAACAAAAFAAAACcAAAACAAAA
+JwAAACgAAAACAAAAKAAAABUAAAACAAAAFQAAAAoAAAACAAAACgAAAAMAAAADAAAACgAAAAQA
+AAAEAAAACwAAAAUAAAAEAAAACgAAAAwAAAAEAAAADAAAAA0AAAAEAAAADQAAAA4AAAAEAAAA
+DgAAAAsAAAAFAAAACwAAAAcAAAAFAAAABwAAAAYAAAAHAAAACwAAAA8AAAAHAAAADwAAABAA
+AAAHAAAAEAAAABEAAAAHAAAAEQAAAAgAAAAIAAAAEQAAACMAAAAIAAAAIwAAABIAAAAJAAAA
+EwAAABQAAAAKAAAAFQAAAAwAAAALAAAADgAAAA8AAAAMAAAAFgAAAA0AAAAMAAAAFQAAABYA
+AAANAAAAFgAAACkAAAANAAAAKQAAABcAAAANAAAAFwAAACoAAAANAAAAKgAAABgAAAANAAAA
+GAAAAA8AAAANAAAADwAAAA4AAAAPAAAAGAAAACoAAAAPAAAAKgAAABkAAAAPAAAAGQAAAB4A
+AAAPAAAAHgAAABoAAAAPAAAAGgAAABsAAAAPAAAAGwAAABwAAAAPAAAAHAAAAB0AAAAPAAAA
+HQAAABAAAAAQAAAAHQAAABEAAAARAAAAHQAAABwAAAARAAAAHAAAABsAAAARAAAAGwAAABoA
+AAARAAAAGgAAAB4AAAARAAAAHgAAAB8AAAARAAAAHwAAACAAAAARAAAAIAAAACEAAAARAAAA
+IQAAACIAAAARAAAAIgAAACMAAAASAAAAIwAAACQAAAASAAAAJAAAABMAAAATAAAAJAAAABQA
+AAAUAAAAJAAAACUAAAAUAAAAJQAAABcAAAAUAAAAFwAAACYAAAAUAAAAJgAAACcAAAAVAAAA
+KAAAABYAAAAWAAAAKAAAACkAAAAXAAAAKQAAACYAAAAXAAAAJQAAABkAAAAXAAAAGQAAACoA
+AAAZAAAAJQAAACQAAAAZAAAAJAAAACsAAAAZAAAAKwAAACIAAAAZAAAAIgAAACEAAAAZAAAA
+IQAAACAAAAAZAAAAIAAAAB8AAAAZAAAAHwAAAB4AAAAiAAAAKwAAACMAAAAjAAAALAAAACQA
+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
+Lz9G72O+jMYTPUwDLz+Q6WO+PgEAAAAAAAABAAAAAgAAAAAAAAACAAAACQAAAAAAAAAJAAAA
+CgAAAAAAAAAKAAAAAwAAAAAAAAADAAAABAAAAAAAAAAEAAAABQAAAAAAAAAFAAAABgAAAAAA
+AAAGAAAAAQAAAAEAAAAHAAAACAAAAAEAAAAIAAAAFQAAAAEAAAAVAAAAFgAAAAEAAAAWAAAA
+CQAAAAEAAAAJAAAAAgAAAAEAAAAGAAAAEAAAAAEAAAAQAAAAGQAAAAEAAAAZAAAAIQAAAAEA
+AAAhAAAAJgAAAAEAAAAmAAAAKgAAAAEAAAAqAAAAKQAAAAEAAAApAAAALgAAAAEAAAAuAAAA
+LQAAAAEAAAAtAAAANQAAAAEAAAA1AAAANAAAAAEAAAA0AAAAMAAAAAEAAAAwAAAAJwAAAAEA
+AAAnAAAAIgAAAAEAAAAiAAAAHQAAAAEAAAAdAAAAGgAAAAEAAAAaAAAAEQAAAAEAAAARAAAA
+BwAAAAMAAAAKAAAACwAAAAMAAAALAAAABAAAAAQAAAALAAAADAAAAAQAAAAMAAAADQAAAAQA
+AAANAAAABQAAAAUAAAANAAAABgAAAAYAAAAOAAAADwAAAAYAAAAPAAAAEAAAAAYAAAANAAAA
+DgAAAAcAAAARAAAAEgAAAAcAAAASAAAAEwAAAAcAAAATAAAAFAAAAAcAAAAUAAAACAAAAAgA
+AAAUAAAAFQAAAAkAAAAWAAAAHwAAAAkAAAAfAAAAHAAAAAkAAAAcAAAAGwAAAAkAAAAbAAAA
+HgAAAAkAAAAeAAAAIwAAAAkAAAAjAAAAKAAAAAkAAAAoAAAAMQAAAAkAAAAxAAAAMgAAAAkA
+AAAyAAAAKwAAAAkAAAArAAAAJQAAAAkAAAAlAAAAIAAAAAkAAAAgAAAAGAAAAAkAAAAYAAAA
+FwAAAAkAAAAXAAAADAAAAAkAAAAMAAAACwAAAAkAAAALAAAACgAAAAwAAAAXAAAADQAAAA0A
+AAAXAAAADgAAAA4AAAAYAAAADwAAAA4AAAAXAAAAGAAAAA8AAAAYAAAAGQAAAA8AAAAZAAAA
+EAAAABEAAAAaAAAAEgAAABIAAAAbAAAAHAAAABIAAAAcAAAAEwAAABIAAAAaAAAAHQAAABIA
+AAAdAAAAHgAAABIAAAAeAAAAGwAAABMAAAAcAAAAFQAAABMAAAAVAAAAFAAAABUAAAAcAAAA
+HwAAABUAAAAfAAAAFgAAABgAAAAgAAAAGQAAABkAAAAgAAAAIQAAAB0AAAAiAAAAIwAAAB0A
+AAAjAAAAHgAAACAAAAAkAAAAIQAAACAAAAAlAAAAJAAAACEAAAAkAAAAJgAAACIAAAAnAAAA
+KAAAACIAAAAoAAAAIwAAACQAAAAlAAAAKQAAACQAAAApAAAAKgAAACQAAAAqAAAAJgAAACUA
+AAArAAAALAAAACUAAAAsAAAALQAAACUAAAAtAAAALgAAACUAAAAuAAAALwAAACUAAAAvAAAA
+KQAAACcAAAAwAAAAKAAAACgAAAAwAAAAMQAAACkAAAAvAAAALgAAACsAAAAyAAAAMwAAACsA
+AAAzAAAALAAAACwAAAAzAAAANAAAACwAAAA0AAAANQAAACwAAAA1AAAALQAAADAAAAA2AAAA
+MQAAADAAAAA0AAAANgAAADEAAAA2AAAAMwAAADEAAAAzAAAAMgAAADMAAAA2AAAANAAAABAA
+AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAgD8tAAAABAAAAGyuFb7rB3M+
+dPMqv2yuFb6Ob3s+dPMqv2yuFb6Ob3s+pEA/v8P2AL48aOw9auxjv8P2AL6Tuv49dPMqv1Cu
+FT6Ob3s+dPMqvxOIBr6Ob3s+Gw9jv6nnKL223kq+auxjv44mBr6Ob3s+auxjv6nnKL2t0Di+
+dPMqv1CuFT6Ob3s+auxjv1CuFT6Tuv49dPMqv9vFez1T00q+auxjv9vFez2t0Di+dPMqv1Cu
+FT48aOw9auxjv04AAAAAAAAAAQAAAAIAAAAAAAAAAgAAAAMAAAAAAAAAAwAAAAQAAAAAAAAA
+BAAAAAkAAAAAAAAACQAAAA0AAAAAAAAADQAAAAsAAAAAAAAACwAAAAUAAAAAAAAABQAAAAEA
+AAABAAAABQAAAAoAAAABAAAACgAAAAgAAAABAAAACAAAAAYAAAABAAAABgAAAAIAAAACAAAA
+BgAAAAMAAAADAAAABwAAAAQAAAADAAAABgAAAAgAAAADAAAACAAAAAoAAAADAAAACgAAAA4A
+AAADAAAADgAAAAwAAAADAAAADAAAAAcAAAAEAAAABwAAAAkAAAAFAAAACwAAAA4AAAAFAAAA
+DgAAAAoAAAAHAAAADAAAAA0AAAAHAAAADQAAAAkAAAALAAAADQAAAAwAAAALAAAADAAAAA4A
+AAAQAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIA/gQAAAAQAAABsrhW+
+0MCPPmrs475srhW+0MCPPoUowr5srhW+LPuXPmrs475QrhU+0MCPPmrs477D9gC+0MCPPkTv
+Y77D9gC+3LPgPkTvY77a2vW9ZBUBP8diob7a2vW9ZBUBP2rs475QrhU+0MCPPkTvY75QrhU+
+nq7gPmrs476NJ4W97hcdP0TvY77Wr+O9CroLPySMl74bfui9lOkIP2rs475QrhU+3LPgPkTv
+Y775pA8+ZBUBP2rs477GFBm9YxwqP0TvY77Wr+O9CroLP2rs4775pA8+ZBUBP0TvY75Cvws+
+d6gFP2rs4762G4K8TAMvP0TvY75hEI68dq8uP7D6Y77wpN+82mksP2rs477GFBm9YxwqP2rs
+4753jwY+CroLP7D6Y77mSw4+2agCP0TvY753jwY+CroLP2rs4762G4K8TAMvP2rs476xUb+6
+1mwwP0TvY7731Gs9YxwqP7D6Y74nTF09W+sqP0TvY76+eow9H+wkP0TvY75Ile891R8PP0Tv
+Y75drg0+nl0DP0TvY77kHg4+P90CP0TvY7731Gs9YxwqP2rs476xUb+61mwwP2rs4757dbE8
+1mwwP0TvY76okkI92mksP2rs474N7BM9TAMvP0TvY757dbE81mwwP2rs476AEwo9jj8vP7D6
+Y77zOgA9z3svP2rs474N7BM9TAMvP2rs4772AAAAAAAAAAEAAAACAAAAAAAAAAIAAAAHAAAA
+AAAAAAcAAAAMAAAAAAAAAAwAAAAQAAAAAAAAABAAAAAWAAAAAAAAABYAAAAVAAAAAAAAABUA
+AAAaAAAAAAAAABoAAAAjAAAAAAAAACMAAAAnAAAAAAAAACcAAAApAAAAAAAAACkAAAAqAAAA
+AAAAACoAAAAlAAAAAAAAACUAAAAiAAAAAAAAACIAAAAZAAAAAAAAABkAAAASAAAAAAAAABIA
+AAAOAAAAAAAAAA4AAAAJAAAAAAAAAAkAAAADAAAAAAAAAAMAAAAIAAAAAAAAAAgAAAAEAAAA
+AAAAAAQAAAABAAAAAQAAAAQAAAAFAAAAAQAAAAUAAAACAAAAAgAAAAUAAAAGAAAAAgAAAAYA
+AAAHAAAAAwAAAAkAAAANAAAAAwAAAA0AAAAIAAAABAAAAAgAAAANAAAABAAAAA0AAAARAAAA
+BAAAABEAAAAYAAAABAAAABgAAAAhAAAABAAAACEAAAAgAAAABAAAACAAAAAfAAAABAAAAB8A
+AAAeAAAABAAAAB4AAAAdAAAABAAAAB0AAAAmAAAABAAAACYAAAAkAAAABAAAACQAAAAbAAAA
+BAAAABsAAAATAAAABAAAABMAAAAPAAAABAAAAA8AAAAKAAAABAAAAAoAAAAFAAAABQAAAAoA
+AAALAAAABQAAAAsAAAAGAAAABgAAAAsAAAAMAAAABgAAAAwAAAAHAAAACQAAAA4AAAANAAAA
+CgAAAA8AAAALAAAACwAAAA8AAAAWAAAACwAAABYAAAAQAAAACwAAABAAAAAMAAAADQAAAA4A
+AAARAAAADgAAABIAAAARAAAADwAAABMAAAAUAAAADwAAABQAAAAVAAAADwAAABUAAAAWAAAA
+EQAAABIAAAAXAAAAEQAAABcAAAAYAAAAEgAAABkAAAAXAAAAEwAAABoAAAAUAAAAEwAAABsA
+AAAjAAAAEwAAACMAAAAaAAAAFAAAABoAAAAVAAAAFwAAABkAAAAiAAAAFwAAACIAAAAcAAAA
+FwAAABwAAAAdAAAAFwAAAB0AAAAeAAAAFwAAAB4AAAAfAAAAFwAAAB8AAAAgAAAAFwAAACAA
+AAAhAAAAFwAAACEAAAAYAAAAGwAAACQAAAAnAAAAGwAAACcAAAAjAAAAHAAAACIAAAAlAAAA
+HAAAACUAAAAmAAAAHAAAACYAAAAdAAAAJAAAACYAAAAoAAAAJAAAACgAAAApAAAAJAAAACkA
+AAAnAAAAJQAAACoAAAAmAAAAJgAAACoAAAApAAAAJgAAACkAAAAoAAAAEAAAAAAAAAAAAAAA
+AAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAACAP3gAAAAEAAAAghYwvRg2S79i+Kq/dzO8vaBM
+Qb/dqqy/dzO8vaIjRr+zirS/dzO8vc6bP79Fd8K/ghYwvQuePL801si/b3KBPRg2S79i+Kq/
+uJwlPBg2S78Sx6m/ghYwvQk5Rr+H3KK/dzO8vbh+M7+Neau/dzO8vS2YNb/U0sa/ghYwvZrH
+Mr9/H82/b3KBPQuePL801si/pZrlPc6bP79Fd8K/pZrlPaIjRr+zirS/pZrlPaBMQb/dqqy/
+b3KBPQk5Rr+H3KK/uJwlPAk5Rr83q6G/ghYwva0vOL9Np6G/dzO8veqi2L5PoqW/ghYwveqi
+2L7iMJu/dzO8vYZtJ781xMe/ghYwvZ7AJL+SD86/b3KBPZrHMr9/H82/pZrlPS2YNb/U0sa/
+pZrlPbh+M7+Neau/b3KBPa0vOL9Np6G/uJwlPK0vOL/+daC/uJwlPOqi2L5E/pm/dzO8veqi
+2L7wx76/dzO8vch8Gr/+I8a/b3KBPZ7AJL+SD86/ghYwvfQIGL/hdcy/pZrlPYZtJ781xMe/
+pZrlPeqi2L5PoqW/b3KBPeqi2L7iMJu/ghYwveqi2L78fMW/b3KBPfQIGL/hdcy/pZrlPch8
+Gr/+I8a/pZrlPeqi2L7wx76/b3KBPeqi2L78fMW/5AAAAAAAAAABAAAAAgAAAAAAAAACAAAA
+AwAAAAAAAAADAAAABAAAAAAAAAAEAAAACwAAAAAAAAALAAAABQAAAAAAAAAFAAAABgAAAAAA
+AAAGAAAAEAAAAAAAAAAQAAAABwAAAAAAAAAHAAAAAQAAAAEAAAAIAAAAEgAAAAEAAAASAAAA
+HAAAAAEAAAAcAAAAHQAAAAEAAAAdAAAAFAAAAAEAAAAUAAAACQAAAAEAAAAJAAAAAwAAAAEA
+AAADAAAAAgAAAAEAAAAHAAAACAAAAAMAAAAJAAAACgAAAAMAAAAKAAAABAAAAAQAAAAKAAAA
+FgAAAAQAAAAWAAAACwAAAAUAAAALAAAADAAAAAUAAAAMAAAADQAAAAUAAAANAAAADgAAAAUA
+AAAOAAAADwAAAAUAAAAPAAAAEAAAAAUAAAAQAAAABgAAAAcAAAAQAAAAGgAAAAcAAAAaAAAA
+EQAAAAcAAAARAAAACAAAAAgAAAARAAAAEwAAAAgAAAATAAAAEgAAAAkAAAAUAAAAFQAAAAkA
+AAAVAAAACgAAAAoAAAAVAAAAHgAAAAoAAAAeAAAAFgAAAAsAAAAWAAAADAAAAAwAAAAWAAAA
+FwAAAAwAAAAXAAAAIAAAAAwAAAAgAAAAJQAAAAwAAAAlAAAAJgAAAAwAAAAmAAAAIQAAAAwA
+AAAhAAAAGAAAAAwAAAAYAAAADgAAAAwAAAAOAAAADQAAAA4AAAAYAAAADwAAAA8AAAAZAAAA
+GgAAAA8AAAAaAAAAEAAAAA8AAAAYAAAAGQAAABEAAAAaAAAAGwAAABEAAAAbAAAAEwAAABIA
+AAATAAAAGwAAABIAAAAbAAAAIgAAABIAAAAiAAAAIQAAABIAAAAhAAAAJgAAABIAAAAmAAAA
+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
+Lz9z8yq/gc5zvJ4fLz9z8yq/sVG/unRvMD9z8yq/e3WxPHRvMD9z8yq/DewTPSgDLz/Y7WO/
+99RrPeEeKj/Y7WO/EmgIPo6RCT9z8yq/d48GPrK5Cz9z8yq/DewTPSgDLz9z8yq/99RrPeEe
+Kj9z8yq/9gAAAAAAAAABAAAABgAAAAAAAAAGAAAADQAAAAAAAAANAAAABwAAAAAAAAAHAAAA
+AgAAAAAAAAACAAAAAwAAAAAAAAADAAAABAAAAAAAAAAEAAAACgAAAAAAAAAKAAAACwAAAAAA
+AAALAAAABQAAAAAAAAAFAAAAAQAAAAEAAAAFAAAADAAAAAEAAAAMAAAAGgAAAAEAAAAaAAAA
+JwAAAAEAAAAnAAAAKAAAAAEAAAAoAAAAKgAAAAEAAAAqAAAAKQAAAAEAAAApAAAAJAAAAAEA
+AAAkAAAAIwAAAAEAAAAjAAAAIgAAAAEAAAAiAAAAIQAAAAEAAAAhAAAAIAAAAAEAAAAgAAAA
+HwAAAAEAAAAfAAAAHgAAAAEAAAAeAAAAHQAAAAEAAAAdAAAAHAAAAAEAAAAcAAAAGwAAAAEA
+AAAbAAAADgAAAAEAAAAOAAAABgAAAAIAAAAHAAAACAAAAAIAAAAIAAAACQAAAAIAAAAJAAAA
+AwAAAAMAAAAJAAAACgAAAAMAAAAKAAAABAAAAAUAAAALAAAAGAAAAAUAAAAYAAAADAAAAAYA
+AAAOAAAADQAAAAcAAAANAAAADwAAAAcAAAAPAAAACAAAAAgAAAAQAAAAEQAAAAgAAAARAAAA
+EgAAAAgAAAASAAAAEwAAAAgAAAATAAAAIwAAAAgAAAAjAAAAJAAAAAgAAAAkAAAAFAAAAAgA
+AAAUAAAAFQAAAAgAAAAVAAAAGQAAAAgAAAAZAAAACQAAAAgAAAAPAAAAFgAAAAgAAAAWAAAA
+EAAAAAkAAAAXAAAAGAAAAAkAAAAYAAAACwAAAAkAAAALAAAACgAAAAkAAAAZAAAAFwAAAAwA
+AAAYAAAAFwAAAAwAAAAXAAAAGgAAAA0AAAAOAAAAGwAAAA0AAAAbAAAAHAAAAA0AAAAcAAAA
+HQAAAA0AAAAdAAAAFgAAAA0AAAAWAAAADwAAABAAAAAeAAAAHwAAABAAAAAfAAAAIAAAABAA
+AAAgAAAAEQAAABAAAAAWAAAAHQAAABAAAAAdAAAAHgAAABEAAAAgAAAAIQAAABEAAAAhAAAA
+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
+AAAIAAAAAgAAAAgAAAADAAAAAwAAAAgAAAAEAAAABAAAAAgAAAAJAAAABQAAAAoAAAALAAAA
+BgAAAAsAAAAQAAAABgAAABAAAAAUAAAABgAAABQAAAAZAAAABgAAABkAAAAYAAAABgAAABgA
+AAAdAAAABgAAAB0AAAAhAAAABgAAACEAAAAlAAAABgAAACUAAAAmAAAABgAAACYAAAAiAAAA
+BgAAACIAAAAeAAAABgAAAB4AAAAaAAAABgAAABoAAAAVAAAABgAAABUAAAARAAAABgAAABEA
+AAAMAAAABgAAAAwAAAAHAAAACAAAAA0AAAAOAAAACAAAAA4AAAAJAAAACgAAAA8AAAAUAAAA
+CgAAABQAAAAQAAAACgAAABAAAAALAAAADAAAABEAAAANAAAADQAAABEAAAAOAAAADgAAABEA
+AAASAAAADwAAABMAAAAZAAAADwAAABkAAAAUAAAAEQAAABUAAAASAAAAEgAAABUAAAAWAAAA
+EwAAABcAAAAYAAAAEwAAABgAAAAZAAAAFQAAABoAAAAbAAAAFQAAABsAAAAWAAAAFwAAABwA
+AAAdAAAAFwAAAB0AAAAYAAAAGgAAAB4AAAAbAAAAGwAAAB4AAAAfAAAAHAAAACAAAAAhAAAA
+HAAAACEAAAAdAAAAHgAAACIAAAAfAAAAHwAAACIAAAAjAAAAIAAAACQAAAAlAAAAIAAAACUA
+AAAhAAAAIgAAACYAAAAjAAAAIwAAACYAAAAlAAAAIwAAACUAAAAkAAAAEAAAAAAAAAAAAAAA
+AAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAACAP2YAAAAEAAAANXDWPXAx1z5E7+O/CQmtvXAx
+1z5E7+O/VKcVPrkEvz5E7+O/8Mz1PbZilT6KdQ7AUyrcPejwmz6KdQ7ANst3PZyHtD6KdQ7A
+sJwlPOpEuz6KdQ7A9nCUPc531T46Cui/lBNWvc531T46Cui/gIN+ug7MuT6KdQ7A3vwkvZyH
+tD6KdQ7AJ8Oyvejwmz6KdQ7AxGXMvbZilT6KdQ7AvvMAvrkEvz5E7+O/VKcVPq2kGj5E7+O/
+VKcVPtAosD426+a/8Mz1PXS1FT2KdQ7AvvMAvtAosD426+a/xGXMvXS1FT2KdQ7AvvMAvq2k
+Gj5E7+O/dXYVPh3xBT5E7+O/SxziPbgl0DyKdQ7AH7W4vbgl0DyKdQ7A38IAvh3xBT5E7+O/
+cruTPVx3ZD1E7+O/Nst3PYz9Ab2KdQ7A3vwkvYz9Ab2KdQ7Ai6hUvVx3ZD1E7+O/sJwlPNSL
+Yz1E7+O/sJwlPHjjxrykzgnAsJwlPBBUHr2KdQ7ALvyQPNB2Gr2KdQ7ANst3PRh4lLykzgnA
+3vwkvRh4lLykzgnAwAAAAAAAAAABAAAADQAAAAAAAAANAAAAEwAAAAAAAAATAAAAFwAAAAAA
+AAAXAAAAGwAAAAAAAAAbAAAAHAAAAAAAAAAcAAAAGAAAAAAAAAAYAAAAFAAAAAAAAAAUAAAA
+DgAAAAAAAAAOAAAAAgAAAAAAAAACAAAAAwAAAAAAAAADAAAABAAAAAAAAAAEAAAABQAAAAAA
+AAAFAAAABgAAAAAAAAAGAAAABwAAAAAAAAAHAAAACAAAAAAAAAAIAAAAAQAAAAEAAAAIAAAA
+BgAAAAEAAAAGAAAACQAAAAEAAAAJAAAACgAAAAEAAAAKAAAACwAAAAEAAAALAAAADAAAAAEA
+AAAMAAAADQAAAAIAAAAOAAAADwAAAAIAAAAPAAAAAwAAAAMAAAAPAAAAEAAAAAMAAAAQAAAA
+FQAAAAMAAAAVAAAAGQAAAAMAAAAZAAAAHwAAAAMAAAAfAAAAHgAAAAMAAAAeAAAAGgAAAAMA
+AAAaAAAAFgAAAAMAAAAWAAAAEgAAAAMAAAASAAAADAAAAAMAAAAMAAAACwAAAAMAAAALAAAA
+CgAAAAMAAAAKAAAACQAAAAMAAAAJAAAABgAAAAMAAAAGAAAABQAAAAMAAAAFAAAABAAAAAYA
+AAAIAAAABwAAAAwAAAARAAAADQAAAAwAAAASAAAAEQAAAA0AAAARAAAAEwAAAA4AAAAUAAAA
+EAAAAA4AAAAQAAAADwAAABAAAAAUAAAAFQAAABEAAAASAAAAEwAAABIAAAAWAAAAFwAAABIA
+AAAXAAAAEwAAABQAAAAYAAAAGQAAABQAAAAZAAAAFQAAABYAAAAaAAAAFwAAABcAAAAaAAAA
+GwAAABgAAAAcAAAAHQAAABgAAAAdAAAAHgAAABgAAAAeAAAAHwAAABgAAAAfAAAAIAAAABgA
+AAAgAAAAGQAAABkAAAAgAAAAHwAAABoAAAAeAAAAIQAAABoAAAAhAAAAGwAAABsAAAAhAAAA
+HgAAABsAAAAeAAAAHQAAABsAAAAdAAAAHAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAA
+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
+AAATAAAACgAAABMAAAAOAAAACgAAAA4AAAANAAAACgAAAA0AAAAMAAAACgAAAAwAAAALAAAA
+EwAAABcAAAAYAAAAEwAAABgAAAAZAAAAEwAAABkAAAAUAAAAFQAAABoAAAAWAAAAFgAAABoA
+AAAbAAAAFgAAABsAAAAcAAAAFwAAAB0AAAAYAAAAGAAAAB0AAAAeAAAAGwAAAB8AAAAdAAAA
+GwAAAB0AAAAgAAAAGwAAACAAAAAcAAAAHQAAAB8AAAAeAAAAEAAAAAAAAAAAAAAAAAAAAAAA
+AAAQAAAAAAAAAAAAAAAAAAAAAACAPzwAAAAEAAAAhQDevSA1Vr1y86q/TrADPiA1Vr1y86q/
+kMPevSA1Vr0mwoC/w/YAvgDMYjly86q/UK4VPgDMYjly86q/1BEEPiA1Vr0mwoC//eWqvLCx
+TL349GO/w/YAvvSR7D349GO/w/YAvhAqXTwmwoC/bK4VvhhDhT749GO/bK4VvtbXjD7ut46/
+bK4VvrfrmD7UjJK/bK4VviIMoz7t2ZK/w/YAviIMoz5y86q/UK4VPiIMoz5y86q/UK4VPhAq
+XTwmwoC/UK4VPvSR7D349GO/MVEoPbCxTL349GO/bK4VviIMoz749GO/UK4VPiIMoz749GO/
+bAAAAAAAAAABAAAABQAAAAAAAAAFAAAAAgAAAAAAAAACAAAAAwAAAAAAAAADAAAADQAAAAAA
+AAANAAAADgAAAAAAAAAOAAAABAAAAAAAAAAEAAAAAQAAAAEAAAAEAAAABQAAAAIAAAAFAAAA
+EQAAAAIAAAARAAAABgAAAAIAAAAGAAAABwAAAAIAAAAHAAAACAAAAAIAAAAIAAAAAwAAAAMA
+AAAIAAAACQAAAAMAAAAJAAAACgAAAAMAAAAKAAAACwAAAAMAAAALAAAADAAAAAMAAAAMAAAA
+DQAAAAQAAAAOAAAAEwAAAAQAAAATAAAAEAAAAAQAAAAQAAAADwAAAAQAAAAPAAAABQAAAAUA
+AAAPAAAAEAAAAAUAAAAQAAAAEQAAAAYAAAARAAAAEAAAAAYAAAAQAAAAEwAAAAYAAAATAAAA
+EgAAAAYAAAASAAAACQAAAAYAAAAJAAAABwAAAAcAAAAJAAAACAAAAAkAAAASAAAADAAAAAkA
+AAAMAAAACwAAAAkAAAALAAAACgAAAAwAAAASAAAAEwAAAAwAAAATAAAADgAAAAwAAAAOAAAA
+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
+D7508yrAR3PMvRavm76GyVfAR3PMvRavm75q7GPAddr1PTTBqj5q7GPAddr1PUd6nb108yrA
+uJwlPHbdG7508yrAR3PMvUd6nb108yrAR3PMvTTBqj5q7GPAnt13PeLMyD5q7GPAddr1PTTB
+qj508yrAR3PMvTTBqj508yrAQg8lveLMyD5q7GPAuJwlPFKd0D5q7GPAuJwlPFOn0D7k8k3A
+nt13PeLMyD508yrAQg8lveLMyD508yrAYRgeveYSyT508yrAuJwlPFOn0D508yrAogAAAAAA
+AAABAAAAAgAAAAAAAAACAAAAAwAAAAAAAAADAAAABAAAAAAAAAAEAAAABQAAAAAAAAAFAAAA
+DQAAAAAAAAANAAAAEgAAAAAAAAASAAAAFgAAAAAAAAAWAAAAFwAAAAAAAAAXAAAAEwAAAAAA
+AAATAAAADgAAAAAAAAAOAAAABgAAAAAAAAAGAAAAAQAAAAEAAAAGAAAABwAAAAEAAAAHAAAA
+AgAAAAIAAAAHAAAACAAAAAIAAAAIAAAACQAAAAIAAAAJAAAACgAAAAIAAAAKAAAAAwAAAAMA
+AAAKAAAABAAAAAQAAAAKAAAACwAAAAQAAAALAAAADAAAAAQAAAAMAAAADQAAAAQAAAANAAAA
+BQAAAAYAAAAOAAAAFAAAAAYAAAAUAAAADwAAAAYAAAAPAAAABwAAAAcAAAAPAAAACAAAAAgA
+AAAPAAAAFAAAAAgAAAAUAAAAGQAAAAgAAAAZAAAAHAAAAAgAAAAcAAAAGwAAAAgAAAAbAAAA
+GgAAAAgAAAAaAAAAFQAAAAgAAAAVAAAAEQAAAAgAAAARAAAACwAAAAgAAAALAAAAEAAAAAgA
+AAAQAAAACQAAAAkAAAAQAAAACgAAAAoAAAAQAAAACwAAAAsAAAARAAAADAAAAAwAAAARAAAA
+FQAAAAwAAAAVAAAAEgAAAAwAAAASAAAADQAAAA4AAAATAAAAGQAAAA4AAAAZAAAAFAAAABIA
+AAAVAAAAGgAAABIAAAAaAAAAFgAAABMAAAAXAAAAGAAAABMAAAAYAAAAHAAAABMAAAAcAAAA
+GQAAABYAAAAaAAAAGwAAABYAAAAbAAAAGAAAABYAAAAYAAAAFwAAABgAAAAbAAAAHAAAAA==</SharedString>
 		<SharedString md5="OOXMZM/6X+KiGUJH2Xqh9g==">Q1NHUEhTBwAAAAIxsbM5tokytgatozu2ui+7+z/5NNlhzq1N8CstXuBYNKFZiLKHoBw1EAAA
 AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAACAPyEAAAAEAAAAwJkZvTAAgL0R
 7Tm8m4oZPTAAgL0R7Tm8wJkZvYzzf70m3hM8wJkZvYCScz2hBKQ8W4oZvTAAgD36xbO8W4oZ
@@ -20108,6 +22825,82 @@ AAAAFQAAABkAAAASAAAAGQAAABYAAAATAAAAFwAAABgAAAATAAAAGAAAABQAAAAWAAAAGQAA
 AB0AAAAWAAAAHQAAABoAAAAXAAAAGwAAACEAAAAXAAAAIQAAABwAAAAXAAAAHAAAABgAAAAa
 AAAAHQAAAB4AAAAbAAAAHwAAACAAAAAbAAAAIAAAACEAAAAdAAAAIgAAAB4AAAAeAAAAIgAA
 ACMAAAAeAAAAIwAAAB8AAAAfAAAAIwAAACQAAAAfAAAAJAAAACAAAAA=</SharedString>
+		<SharedString md5="wCP6Q/RhK7s4n/vnhkwycg==">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
+DAAAAAgAAAAMAAAACgAAAA==</SharedString>
+		<SharedString md5="xMes/EWWoxhXwJbcmfYKrA==">Q1NHUEhTBgAAAPJt8T1NNeIgD8s/PXNHa73d1c08C8o2H+lO5Z6AOaA7VUvEO4BWqTwQAAAA
+AAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIA/KgAAAAQAAAAERJu98ktHv6a2
+Gj0ERJu9OKrTvgkUO74ERJs98ktHv6a2Gj0ap3G9H1gEv7IF8T4ERJu9NacUv3niuj4ERJu9
+AAAAAOwhr74ERJs9OKrTvgkUO74ERJs9NacUv3niuj4ap3E9H1gEv7IF8T4ap3G9AAAAAH2V
+Rz4ERJu9AAAAANTBhD0ERJs9AAAAAOwhr74ERJs9AAAAANTBhD0ap3E9AAAAAH2VRz5IAAAA
+AAAAAAEAAAAGAAAAAAAAAAYAAAACAAAAAAAAAAIAAAAIAAAAAAAAAAgAAAADAAAAAAAAAAMA
+AAAEAAAAAAAAAAQAAAAKAAAAAAAAAAoAAAAFAAAAAAAAAAUAAAABAAAAAQAAAAUAAAALAAAA
+AQAAAAsAAAAGAAAAAgAAAAYAAAALAAAAAgAAAAsAAAAMAAAAAgAAAAwAAAAHAAAAAgAAAAcA
+AAAIAAAAAwAAAAgAAAANAAAAAwAAAA0AAAAJAAAAAwAAAAkAAAAKAAAAAwAAAAoAAAAEAAAA
+BQAAAAoAAAAJAAAABQAAAAkAAAANAAAABQAAAA0AAAAMAAAABQAAAAwAAAALAAAABwAAAAwA
+AAAIAAAACAAAAAwAAAANAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA
+AACAPzAAAAAEAAAAGqdxPQAAAABsr0c+GqdxvQAAAABsr0c+BESbPQAAAAA22IQ9BESbPfJL
+Rz8MqbS9GqdxPfRGRz+E+A89BESbvQAAAAA22IQ9GqdxvfRGRz+E+A89BESbvfJLRz8MqbS9
+BESbPQAAAAD0H6++BESbPfJLRz+yBfG+BESbvQAAAAD0H6++BESbvfJLRz+yBfG+BESbPcgo
+gj0So7u+BESbPY3rAj8za+2+BESbvcgogj0So7u+BESbvY3rAj8za+2+VAAAAAAAAAABAAAA
+BQAAAAAAAAAFAAAACgAAAAAAAAAKAAAACAAAAAAAAAAIAAAAAgAAAAAAAAACAAAAAwAAAAAA
+AAADAAAABAAAAAAAAAAEAAAABgAAAAAAAAAGAAAAAQAAAAEAAAAGAAAABwAAAAEAAAAHAAAA
+BQAAAAIAAAAIAAAADAAAAAIAAAAMAAAADQAAAAIAAAANAAAACQAAAAIAAAAJAAAAAwAAAAMA
+AAAJAAAACwAAAAMAAAALAAAABwAAAAMAAAAHAAAABgAAAAMAAAAGAAAABAAAAAUAAAAHAAAA
+CwAAAAUAAAALAAAADwAAAAUAAAAPAAAADgAAAAUAAAAOAAAACgAAAAgAAAAKAAAADgAAAAgA
+AAAOAAAADAAAAAkAAAANAAAADwAAAAkAAAAPAAAACwAAAAwAAAAOAAAADwAAAAwAAAAPAAAA
+DQAAAA==</SharedString>
 		<SharedString md5="yuZpQdnvvUBOTYh1jqZ2cA=="></SharedString>
 	</SharedStrings>
 </roblox>
