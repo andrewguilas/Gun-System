@@ -63,18 +63,18 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>7.83605766</X>
-					<Y>34.4016457</Y>
-					<Z>35.6970139</Z>
-					<R00>0.159902677</R00>
-					<R01>0.600940943</R01>
-					<R02>-0.783135414</R02>
-					<R10>-0</R10>
-					<R11>0.793343544</R11>
-					<R12>0.608774185</R12>
-					<R20>0.987132788</R20>
-					<R21>-0.097344622</R21>
-					<R22>0.126857758</R22>
+					<X>10.798871</X>
+					<Y>34.4909782</Y>
+					<Z>36.0280113</Z>
+					<R00>0.386202127</R00>
+					<R01>-0.60273093</R01>
+					<R02>0.698257446</R02>
+					<R10>-1.4901163e-08</R10>
+					<R11>0.756989121</R11>
+					<R12>0.653427541</R12>
+					<R20>-0.922414303</R20>
+					<R21>-0.252355099</R21>
+					<R22>0.292350709</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
@@ -13153,11 +13153,12 @@ gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 					<string name="ScriptGuid">{9756D698-FA26-4B8D-97C0-CC4386906D80}</string>
 					<ProtectedString name="Source"><![CDATA[local GUN_TAG = "Gun"
 local CollectionService = game:GetService("CollectionService")
+local p = game.Players.LocalPlayer
 local core = require(game.ReplicatedStorage.Core)
 local collection = core("collection")
 
 function init(tool)
-	if tool.Parent:IsA("Backpack") then
+	if tool.Parent == p:WaitForChild("Backpack") then
 		local tags = CollectionService:GetTags(tool)
 		local gunModule
 		for _,tag in pairs(tags) do
@@ -13328,6 +13329,10 @@ end
 
 -- instance events
 
+function module:charDied()
+	disconnectCon({self.temp.currentOnInputBegan, self.temp.currentOnInputEnded, self.temp.currentOnStepped})
+end
+
 function module:onDamageDealtFired(...)
 	self:showDamageDealt(...)
 end
@@ -13428,6 +13433,10 @@ function module.init(tool)
 		self:onDamageDealtFired(...)
 	end)
 	
+	self.player.hum.Died:Connect(function()
+		self:charDied()
+	end)
+
 	-- compile
 
 	self:updateUI()
