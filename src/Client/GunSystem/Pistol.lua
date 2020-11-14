@@ -51,9 +51,9 @@ function module:showDamageDealt(receiver, damageType, amount)
 		end
 
 		if damageType == "head" then
-			playSound(self.sounds.headHitSound, self.tool.handle)
+			playSound(self.sounds.hitSound, self.tool.handle)
 		else
-			playSound(self.sounds.nonheadHitSound, self.tool.handle)
+			playSound(self.sounds.hitSound, self.tool.handle)
 		end
 
 		Debris:AddItem(newIndicator, Settings.UI.DamageIndicator.maxduration)
@@ -213,8 +213,7 @@ function module.init(tool)
 			toolUI = script:WaitForChild("UI"),
 		},
 		sounds = {
-			headHitSound = tool.Handle:WaitForChild("HeadHit"),
-			nonheadHitSound = tool.Handle:WaitForChild("NonheadHit"),
+			hitSound = tool.Handle:WaitForChild("Hit")
 		},		
 		temp = {
 			timeOfRecentFire = os.clock(),
