@@ -146,6 +146,10 @@ end
 
 -- instance events
 
+function module:charDied()
+	disconnectCon({self.temp.currentOnInputBegan, self.temp.currentOnInputEnded, self.temp.currentOnStepped})
+end
+
 function module:onDamageDealtFired(...)
 	self:showDamageDealt(...)
 end
@@ -246,6 +250,10 @@ function module.init(tool)
 		self:onDamageDealtFired(...)
 	end)
 	
+	self.player.hum.Died:Connect(function()
+		self:charDied()
+	end)
+
 	-- compile
 
 	self:updateUI()
