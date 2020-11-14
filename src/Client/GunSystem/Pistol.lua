@@ -10,57 +10,29 @@ local Debris = game:GetService("Debris")
 local Settings = require(game.ReplicatedStorage.Settings[script.Name])
 local Core = require(game.ReplicatedStorage.Core)
 local waitForPath = Core("waitForPath")
+local newThread = Core("newThread")
 local newTween = Core("newTween")
 local playSound = Core("playSound")
 local disconnectCon = Core("disconnectCon")
+local randomnum = Core("randomnum")
 
 local p = game.Players.LocalPlayer
 
 -- // FUNCTIONS \\ --
 
 function module:invokeRemote(remote, ...)
-	local success, errorMsg = remote:InvokeServer(...)
-	if errorMsg and Settings.willDebug then
+	local success, msg = remote:InvokeServer(...)
+	if msg and Settings.willDebug then
 		if success then
-			print(errorMsg)
+			print(msg)
 		else
-			warn(errorMsg)
+			warn(msg)
 		end
 	end
-	return success, errorMsg
+	return success, msg
 end
 
 -- indirect
-
-function module:showDamageDealt(receiver, damageType, amount)
-	local root = receiver:FindFirstChild("HumanoidRootPart")
-	if root then
-		local newIndicator = self.UI.toolUI.DamageIndicator:Clone() do
-			newIndicator.TextLabel.Text = amount
-			newIndicator.TextLabel.TextColor3 = Settings.UI.DamageIndicator[damageType].color
-			newIndicator.TextLabel.TextStrokeTransparency = Settings.UI.DamageIndicator[damageType].stroke
-			newIndicator.TextLabel.TextStrokeColor3 = Settings.UI.DamageIndicator[damageType].strokeColor
-			newIndicator.TextLabel.TextTransparency = 1
-			newIndicator.Enabled = true
-			newIndicator.Parent = root 
-			newIndicator.StudsOffset = Vector3.new(
-				math.random(Settings.UI.DamageIndicator.minOffset.X * 10, Settings.UI.DamageIndicator.maxOffset.X * 10) / 10, 
-				math.random(Settings.UI.DamageIndicator.minOffset.Y * 10, Settings.UI.DamageIndicator.maxOffset.Y * 10) / 10, 
-				0
-			)
-		end
-
-		if damageType == "head" then
-			playSound(self.sounds.hitSound, self.tool.handle)
-		else
-			playSound(self.sounds.hitSound, self.tool.handle)
-		end
-
-		Debris:AddItem(newIndicator, Settings.UI.DamageIndicator.maxduration)
-		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 0}).Completed:Wait()
-		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 1})
-	end	
-end
 
 function module:updateMouseIcon()
 	if self.temp.mouse and not self.tool.tool.Parent:IsA("Backpack") then
@@ -82,22 +54,19 @@ function module:reloadGun()
 end
 
 function module:initEvents()
-	disconnectCon({self.temp.currentOnInputBegan, self.temp.currentOnInputEnded, self.temp.currentOnStepped})
+	disconnectCon(self.temp.connections)
+
+	self.temp.connections.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
+		self:onInputBegan(...)
+	end)
+
 	if self.tool.fireMode.Value == "auto" then	
-		self.temp.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
-			self:onInputBegan(...)
-		end)
-		
-		self.temp.currentOnInputEnded = UserInputService.InputEnded:Connect(function(...)
+		self.temp.connections.currentOnInputEnded = UserInputService.InputEnded:Connect(function(...)
 			self:onInputEnded(...)
 		end)
 	
-		self.temp.currentOnStepped = RunService.Stepped:Connect(function(...)
+		self.temp.connections.currentOnStepped = RunService.Stepped:Connect(function(...)
 			self:onStepped(...)
-		end)
-	else
-		self.temp.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
-			self:onInputBegan(...)
 		end)
 	end
 end
@@ -146,44 +115,78 @@ end
 
 -- instance events
 
-function module:charDied()
-	disconnectCon({self.temp.currentOnInputBegan, self.temp.currentOnInputEnded, self.temp.currentOnStepped})
-end
-
-function module:onDamageDealtFired(...)
-	self:showDamageDealt(...)
-end
-
-function module:updateUI()
-	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 1}).Completed:Wait()
-	self.UI.gunInfoUI.Ammo.Text = '<font size="100"><font color = "rgb(255, 255, 255)">' .. self.tool.ammo.Value .. '</font></font><font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
-	self.UI.gunInfoUI.FireMode.Text = self.tool.fireMode.Value:upper()
-	self.UI.gunInfoUI.Weapon.Text = script.Name:upper()
-	newTween(self.UI.gunInfoUI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 0})
-end
-
 function module:onToolEquip(playerMouse)
-	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.shownPos})
-	self:updateUI()
-	self:invokeRemote(self.tool.remotes.ChangeStatus, "equip")
-	self.anims.holdAnim:Play()
-
 	self.temp.mouse = playerMouse
 	self.temp.expectingInput = true
 	self.temp.isMouseDown = false
 
+	newThread(function()
+		self:updateUI()
+	end)
+
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.shownPos})
 	self:updateMouseIcon()
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "equip")
+	self.anims.holdAnim:Play()
 	self:initEvents()
 end
 
 function module:onToolUnequip()
-	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.hiddenPos})
-	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
-	self.anims.holdAnim:Stop()
 
 	self.temp.expectingInput = false
 	self.temp.isMouseDown = false
+
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.hiddenPos})
 	self:updateMouseIcon()
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
+	self.anims.holdAnim:Stop()
+	disconnectCon(self.temp.connections)
+end
+
+function module:updateUI()
+	local UI = self.UI.gunInfoUI
+	local currentAmmoText = '<font size="100"><font color = "rgb(255, 255, 255)">' .. self.tool.ammo.Value .. '</font></font>'
+	local currentMaxAmmoText = '<font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
+
+	newTween(UI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 1}).Completed:Wait()
+	UI.Ammo.Text = currentAmmoText .. currentMaxAmmoText
+	UI.FireMode.Text = self.tool.fireMode.Value:upper()
+	UI.Weapon.Text = script.Name:upper()
+	newTween(UI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 0})
+end
+
+function module:showDamageDealt(receiver, damageType, amount)
+	local root = receiver:FindFirstChild("HumanoidRootPart")
+	if root then
+		local newIndicator = self.UI.toolUI.DamageIndicator:Clone() do
+			newIndicator.TextLabel.Text = amount
+
+			for propertyName, propertyValue in pairs(Settings.UI.DamageIndicator[damageType]) do
+				newIndicator.TextLabel[propertyName] = propertyValue
+			end
+
+			newIndicator.Enabled = true
+			newIndicator.Parent = root 
+
+			local minOffset = Settings.UI.DamageIndicator.minOffset
+			local maxOffset = Settings.UI.DamageIndicator.minOffset
+			newIndicator.StudsOffset = Vector3.new(
+				randomnum(minOffset.X, maxOffset.X, 10),
+				randomnum(minOffset.Y, maxOffset.Y, 10),
+				0
+			)
+		end
+
+		playSound(self.sounds.hitSound, self.tool.handle)
+
+		Debris:AddItem(newIndicator, Settings.UI.DamageIndicator.maxduration)
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 0}).Completed:Wait()
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 1})
+	end	
+end
+
+function module:charDied()
+	disconnectCon(self.temp.connections)
 end
 
 -- // INIT \\ --
@@ -200,15 +203,13 @@ function module.init(tool)
 		},
 		tool = {
 			tool = tool,
-			Settings = require(game.ReplicatedStorage.Settings[tool.Name]),
 			handle = tool:WaitForChild("Handle"),
 			ammo = waitForPath(tool, "Values.Ammo"),
 			fireMode = waitForPath(tool, "Values.FireMode"),
 			remotes = tool:WaitForChild("Remotes"),
 		},
 		anims = {
-			anims = script:WaitForChild("Animations"),
-			holdAnim = p.Character.Humanoid:LoadAnimation(script.Animations:WaitForChild("Hold")),
+			holdAnim = p.Character.Humanoid:LoadAnimation(waitForPath(script, "Animations.Hold")),
 			shootAnim = p.Character.Humanoid:LoadAnimation(script.Animations:WaitForChild("Shoot")),
 			reloadAnim = p.Character.Humanoid:LoadAnimation(script.Animations:WaitForChild("Reload")),
 		},		
@@ -225,9 +226,11 @@ function module.init(tool)
 			expectingInput = nil,
 			isMouseDown = nil,
 
-			currentOnInputBegan = nil,
-			currentOnInputEnded = nil,
-			currentOnStepped = nil,
+			connections = {
+				currentOnInputBegan = nil,
+				currentOnInputEnded = nil,
+				currentOnStepped = nil,
+			}
 		}	
 	}
 	setmetatable(self, module)
@@ -247,7 +250,7 @@ function module.init(tool)
 	end)
 	
 	self.tool.remotes:WaitForChild("DamageDealt").OnClientEvent:Connect(function(...)
-		self:onDamageDealtFired(...)
+		self:showDamageDealt(...)
 	end)
 	
 	self.player.hum.Died:Connect(function()

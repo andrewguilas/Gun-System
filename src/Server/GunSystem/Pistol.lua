@@ -59,6 +59,7 @@ function module:playHitFX(part, position, normal)
 		ColorSequenceKeypoint.new(0.5, part.Color),
 		ColorSequenceKeypoint.new(1, part.Color)
 	})
+	
 	particle.Parent = attachment
 	Debris:AddItem(attachment, particle.Lifetime.Max)
 
@@ -70,12 +71,14 @@ end
 -- indirect
 
 function module:getCharFromHitPart(part)
-	for _,p in pairs(game.Players:GetPlayers()) do
-		local char = p.Character
-		if char and part:IsDescendantOf(char) then
-			return char
+	local currentInstance = part
+	repeat
+		if currentInstance:FindFirstChildWhichIsA("Humanoid") then
+			return currentInstance
+		else
+			currentInstance = currentInstance.Parent
 		end
-	end
+	until currentInstance:IsA("Workspace")
 end
 
 function module:fire(direction, sender)	
@@ -92,7 +95,7 @@ function module:fire(direction, sender)
 	self.tool.ammo.Value -= Settings.bulletsPerShot
 	self.fastCast.caster:Fire(self.tool.firePointObj.WorldPosition, direction, modifiedBulletSpeed, self.fastCast.castBehavior, sender)
 	
-	newThread(playSound, self.sounds.fireSound, self.tool.handle)
+	newThread(playSound, self.sounds.shootSound, self.tool.handle)
 	
 	newThread(function()
 		self:playMuzzleFlash()
@@ -116,7 +119,7 @@ function module:onRayHit(cast, raycastResult, segmentVelocity, cosmeticBulletObj
 
 	-- check if hit
 	if hitPart then
-		local char = self:getCharFromHitPart(hitPart)
+		local char = self:getCharFromHitPart(hitPart) or hitPart.Parent:FindFirstChildWhichIsA("Humanoid") and hitPart.Parent
 		if char then
 			local hum = char:FindFirstChildWhichIsA("Humanoid")
 			if hum then
@@ -243,12 +246,13 @@ function module:onChangeFireMode(p)
 	elseif oldFireModeIndex < #fireModes then
 		newFireMode = fireModes[oldFireModeIndex + 1]
 	end
-
 	if newFireMode then
 		self.tool.fireMode.Value = newFireMode
 		return newFireMode
 	end
 end
+
+-- // INIT \\ --
 
 function module.init(tool)
 	
@@ -265,14 +269,7 @@ function module.init(tool)
 			ammo = tool.Values.Ammo,
 			fireMode = tool.Values.FireMode
 		},
-		sounds = {
-			sounds = tool.Sounds,
-			fireSound = nil,
-			equipSound = nil,
-			unequipSound = nil,
-			reloadSound = nil,
-			jamSound = nil,
-		},
+		sounds = {},
 		VFX = {
 			impactParticle = tool.Handle.ImpactParticle,
 			muzzleFlash = tool.Handle.MuzzleFlash,
@@ -297,19 +294,10 @@ function module.init(tool)
 	self.tool.ammo.Value = Settings.maxAmmo
 
 	-- sets sounds
-	
-	for _,sound in pairs(self.sounds.sounds:GetChildren()) do
+	for _,sound in pairs(tool.Sounds:GetChildren()) do
 		sound.Parent = self.tool.handle
+		self.sounds[sound.Name:sub(1, 1):lower() .. sound.Name:sub(2, #sound.Name) .. "Sound"] = sound
 	end
-
-	self.sounds.fireSound = self.tool.handle.Shoot
-	self.sounds.equipSound = self.tool.handle.Equip
-	self.sounds.unequipSound = self.tool.handle.Unequip
-	self.sounds.reloadSound = self.tool.handle.Reload
-	self.sounds.jamSound = self.tool.handle.Jam
-
-	self.sounds.sounds:Destroy()
-
 	-- creates bullet
 	
 	self.fastCast.cosmeticBullet = Instance.new("Part")

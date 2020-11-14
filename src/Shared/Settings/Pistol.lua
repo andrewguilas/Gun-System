@@ -36,19 +36,22 @@ local Settings = {
 	UI = {
 		DamageIndicator = {
 			head = {
-				color = Color3.fromRGB(255, 255, 150),
-				strokeColor = Color3.fromRGB(55, 45, 0),
-				stroke = 0.7
+				TextColor3 = Color3.fromRGB(255, 255, 150),
+				TextStrokeColor3 = Color3.fromRGB(55, 45, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
 			},
 			torso = {
-				color = Color3.fromRGB(255, 255, 255),
-				strokeColor = Color3.fromRGB(0, 0, 0),
-				stroke = 0.7
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
 			},
 			limb = {
-				color = Color3.fromRGB(255, 255, 255),
-				strokeColor = Color3.fromRGB(0, 0, 0),
-				stroke = 0.7
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
 			},
 			maxduration = 2,
 			tweenInfo = TweenInfo.new(0.5),
