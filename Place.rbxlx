@@ -13197,6 +13197,7 @@ local newThread = Core("newThread")
 local newTween = Core("newTween")
 local playSound = Core("playSound")
 local disconnectCon = Core("disconnectCon")
+local randomnum = Core("randomnum")
 
 local p = game.Players.LocalPlayer
 
@@ -13237,21 +13238,18 @@ end
 
 function module:initEvents()
 	disconnectCon(self.temp.connections)
+
+	self.temp.connections.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
+		self:onInputBegan(...)
+	end)
+
 	if self.tool.fireMode.Value == "auto" then	
-		self.temp.connections.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
-			self:onInputBegan(...)
-		end)
-		
 		self.temp.connections.currentOnInputEnded = UserInputService.InputEnded:Connect(function(...)
 			self:onInputEnded(...)
 		end)
 	
 		self.temp.connections.currentOnStepped = RunService.Stepped:Connect(function(...)
 			self:onStepped(...)
-		end)
-	else
-		self.temp.connections.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
-			self:onInputBegan(...)
 		end)
 	end
 end
@@ -13317,13 +13315,15 @@ function module:onToolEquip(playerMouse)
 end
 
 function module:onToolUnequip()
-	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.hiddenPos})
-	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
-	self.anims.holdAnim:Stop()
 
 	self.temp.expectingInput = false
 	self.temp.isMouseDown = false
+
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.hiddenPos})
 	self:updateMouseIcon()
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
+	self.anims.holdAnim:Stop()
+	disconnectCon(self.temp.connections)
 end
 
 function module:updateUI()
@@ -13343,24 +13343,24 @@ function module:showDamageDealt(receiver, damageType, amount)
 	if root then
 		local newIndicator = self.UI.toolUI.DamageIndicator:Clone() do
 			newIndicator.TextLabel.Text = amount
-			newIndicator.TextLabel.TextColor3 = Settings.UI.DamageIndicator[damageType].color
-			newIndicator.TextLabel.TextStrokeTransparency = Settings.UI.DamageIndicator[damageType].stroke
-			newIndicator.TextLabel.TextStrokeColor3 = Settings.UI.DamageIndicator[damageType].strokeColor
-			newIndicator.TextLabel.TextTransparency = 1
+
+			for propertyName, propertyValue in pairs(Settings.UI.DamageIndicator[damageType]) do
+				newIndicator.TextLabel[propertyName] = propertyValue
+			end
+
 			newIndicator.Enabled = true
 			newIndicator.Parent = root 
+
+			local minOffset = Settings.UI.DamageIndicator.minOffset
+			local maxOffset = Settings.UI.DamageIndicator.minOffset
 			newIndicator.StudsOffset = Vector3.new(
-				math.random(Settings.UI.DamageIndicator.minOffset.X * 10, Settings.UI.DamageIndicator.maxOffset.X * 10) / 10, 
-				math.random(Settings.UI.DamageIndicator.minOffset.Y * 10, Settings.UI.DamageIndicator.maxOffset.Y * 10) / 10, 
+				randomnum(minOffset.X, maxOffset.X, 10),
+				randomnum(minOffset.Y, maxOffset.Y, 10),
 				0
 			)
 		end
 
-		if damageType == "head" then
-			playSound(self.sounds.hitSound, self.tool.handle)
-		else
-			playSound(self.sounds.hitSound, self.tool.handle)
-		end
+		playSound(self.sounds.hitSound, self.tool.handle)
 
 		Debris:AddItem(newIndicator, Settings.UI.DamageIndicator.maxduration)
 		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 0}).Completed:Wait()
@@ -13369,7 +13369,7 @@ function module:showDamageDealt(receiver, damageType, amount)
 end
 
 function module:charDied()
-	disconnectCon({self.temp.connections.currentOnInputBegan, self.temp.connections.currentOnInputEnded, self.temp.connections.currentOnStepped})
+	disconnectCon(self.temp.connections)
 end
 
 -- // INIT \\ --
@@ -16438,19 +16438,34 @@ end]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="Script" referent="RBXCCBB3F80F3CA4F35B1E91988705C7677">
+			<Item class="ModuleScript" referent="RBXFD46FC146C3F4CC19C6A6CAB9CF43829">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
-					<bool name="Disabled">false</bool>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">disconnectCon</string>
-					<string name="ScriptGuid">{0A1A7E70-710C-447D-AB0A-0A503743FAFA}</string>
+					<string name="ScriptGuid">{327C4E10-B2CF-433F-8491-32397605B909}</string>
 					<ProtectedString name="Source"><![CDATA[return function(connections)
 	for _,con in pairs(connections) do
 		if con then
 			con:Disconnect()
 		end
 	end
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX21C782337BB6460793D555C25E0AFA31">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">randomnum</string>
+					<string name="ScriptGuid">{6E735757-8136-4AC0-AEB7-2DF6E0BE1DA0}</string>
+					<ProtectedString name="Source"><![CDATA[return function(min, max, multiplier)
+    if not multiplier then
+        multiplier = 1
+    end
+    return math.random(min * 10 ^ multiplier, max * 10 ^ multiplier) / 10 ^ multiplier
 end]]></ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
@@ -16554,6 +16569,7 @@ function module:playHitFX(part, position, normal)
 		ColorSequenceKeypoint.new(0.5, part.Color),
 		ColorSequenceKeypoint.new(1, part.Color)
 	})
+	
 	particle.Parent = attachment
 	Debris:AddItem(attachment, particle.Lifetime.Max)
 
@@ -16589,7 +16605,7 @@ function module:fire(direction, sender)
 	self.tool.ammo.Value -= Settings.bulletsPerShot
 	self.fastCast.caster:Fire(self.tool.firePointObj.WorldPosition, direction, modifiedBulletSpeed, self.fastCast.castBehavior, sender)
 	
-	newThread(playSound, self.sounds.fireSound, self.tool.handle)
+	newThread(playSound, self.sounds.shootSound, self.tool.handle)
 	
 	newThread(function()
 		self:playMuzzleFlash()
@@ -16740,12 +16756,13 @@ function module:onChangeFireMode(p)
 	elseif oldFireModeIndex < #fireModes then
 		newFireMode = fireModes[oldFireModeIndex + 1]
 	end
-
 	if newFireMode then
 		self.tool.fireMode.Value = newFireMode
 		return newFireMode
 	end
 end
+
+-- // INIT \\ --
 
 function module.init(tool)
 	
@@ -16762,14 +16779,7 @@ function module.init(tool)
 			ammo = tool.Values.Ammo,
 			fireMode = tool.Values.FireMode
 		},
-		sounds = {
-			sounds = tool.Sounds,
-			fireSound = nil,
-			equipSound = nil,
-			unequipSound = nil,
-			reloadSound = nil,
-			jamSound = nil,
-		},
+		sounds = {},
 		VFX = {
 			impactParticle = tool.Handle.ImpactParticle,
 			muzzleFlash = tool.Handle.MuzzleFlash,
@@ -16794,19 +16804,10 @@ function module.init(tool)
 	self.tool.ammo.Value = Settings.maxAmmo
 
 	-- sets sounds
-	
-	for _,sound in pairs(self.sounds.sounds:GetChildren()) do
+	for _,sound in pairs(tool.Sounds:GetChildren()) do
 		sound.Parent = self.tool.handle
+		self.sounds[sound.Name:sub(1, 1):lower() .. sound.Name:sub(2, #sound.Name) .. "Sound"] = sound
 	end
-
-	self.sounds.fireSound = self.tool.handle.Shoot
-	self.sounds.equipSound = self.tool.handle.Equip
-	self.sounds.unequipSound = self.tool.handle.Unequip
-	self.sounds.reloadSound = self.tool.handle.Reload
-	self.sounds.jamSound = self.tool.handle.Jam
-
-	self.sounds.sounds:Destroy()
-
 	-- creates bullet
 	
 	self.fastCast.cosmeticBullet = Instance.new("Part")
@@ -18480,19 +18481,22 @@ collection(NPC_TAG, init)
 	UI = {
 		DamageIndicator = {
 			head = {
-				color = Color3.fromRGB(255, 255, 150),
-				strokeColor = Color3.fromRGB(55, 45, 0),
-				stroke = 0.7
+				TextColor3 = Color3.fromRGB(255, 255, 150),
+				TextStrokeColor3 = Color3.fromRGB(55, 45, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
 			},
 			torso = {
-				color = Color3.fromRGB(255, 255, 255),
-				strokeColor = Color3.fromRGB(0, 0, 0),
-				stroke = 0.7
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
 			},
 			limb = {
-				color = Color3.fromRGB(255, 255, 255),
-				strokeColor = Color3.fromRGB(0, 0, 0),
-				stroke = 0.7
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
 			},
 			maxduration = 2,
 			tweenInfo = TweenInfo.new(0.5),
@@ -18537,12 +18541,12 @@ return Settings]]></ProtectedString>
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="ModuleScript" referent="RBX39F96F686E6744E7B143841F26C4035B">
+		<Item class="ModuleScript" referent="RBXEF12C44CFF7B474C9F2B2406155F0288">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Core</string>
-				<string name="ScriptGuid">{39CC58FE-35BD-45FA-86A6-A9B228DA7C01}</string>
+				<string name="ScriptGuid">{0C5AE793-B0E7-42CC-B418-3A5C21A1D25B}</string>
 				<ProtectedString name="Source"><![CDATA[local modules = {}
 
 local function loadModule(name)
@@ -18561,31 +18565,79 @@ return function(name)
 		warn(name .. " does not exist")
 	end	
 end]]></ProtectedString>
-				<int64 name="SourceAssetId">5934744471</int64>
+				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBXC0F3BDFB77204E16862CA703C4C3A521">
+			<Item class="ModuleScript" referent="RBX35939C502B734DC9AA70D03D5B3A266A">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">round</string>
-					<string name="ScriptGuid">{ACB27393-E6BA-477B-B998-C7D8866FA414}</string>
-					<ProtectedString name="Source"><![CDATA[return function(n, Places)
-	if not Places then
-		return math.floor(n + 0.5)
+					<string name="Name">cloneTable</string>
+					<string name="ScriptGuid">{F200F4E7-EE2E-4B62-82CE-7523E88B93FB}</string>
+					<ProtectedString name="Source"><![CDATA[local core = require(script.Parent)
+local cloneTable = core("cloneTable")
+
+return function(OriginalTable)
+	local copy = {}
+	for k, v in pairs(OriginalTable) do
+		if type(v) == "table" then
+			v = cloneTable(v)
+		end
+		copy[k] = v
 	end
-	return math.floor((n * 10 ^ Places) + 0.5) / 10 ^ Places
+	return copy
 end]]></ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX34164F6C82EC40888821952191BD56B2">
+			<Item class="ModuleScript" referent="RBX4830C883B5794311B3FACD9AA9AA37CB">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">collection</string>
+					<string name="ScriptGuid">{724793EA-C6F4-46F7-A943-F839A30EFD94}</string>
+					<ProtectedString name="Source"><![CDATA[local core = require(script.Parent)
+local newThread = core("newThread")
+
+return function(tag, func)
+	local CollectionService = game:GetService("CollectionService")
+
+	for _,obj in pairs(CollectionService:GetTagged(tag)) do
+		newThread(func, obj)
+	end
+
+	CollectionService:GetInstanceAddedSignal(tag):Connect(function(obj)
+		newThread(func, obj)
+	end)
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXF4A490FEA0CE44D48209D736DD9E9B56">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">disconnectCon</string>
+					<string name="ScriptGuid">{2C331C4E-64D1-4FD6-9A70-8008B6F6FDB3}</string>
+					<ProtectedString name="Source"><![CDATA[return function(connections)
+	for _,con in pairs(connections) do
+		if con then
+			con:Disconnect()
+		end
+	end
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX6EDD9CFF0E4440DC833DA8E6E3047F85">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">get</string>
-					<string name="ScriptGuid">{DA013A40-EF3E-4E4C-86AE-DE51664D5ACC}</string>
+					<string name="ScriptGuid">{E11434F8-D124-4A90-BA02-2699327C4032}</string>
 					<ProtectedString name="Source"><![CDATA[return function(Parent, Class)
 	local Tbl = {}
 	for _,v in pairs(Parent:GetChildren()) do
@@ -18599,12 +18651,173 @@ end]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX25F7618882B54F7C83234FA28C30E748">
+			<Item class="ModuleScript" referent="RBX07389BCC93E44C56ABE9DAA7E172E549">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">mag</string>
+					<string name="ScriptGuid">{32D293B0-07B0-4F6C-BD7B-D39C096416F5}</string>
+					<ProtectedString name="Source"><![CDATA[return function(Start, End)
+
+	if typeof(Start) ~= "Vector3" then
+		Start = Start.Position
+	end
+
+	if typeof(End) ~= "Vector3" then
+		End = End.Position
+	end	
+
+	return (Start-End).Magnitude
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXBE35A73FF9FB4F7EA50FB17D7DC81D44">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">newEvent</string>
+					<string name="ScriptGuid">{00A88D23-451A-4E12-8D4B-BFB4CFC5E944}</string>
+					<ProtectedString name="Source"><![CDATA[return function()
+	local Signal, Arguments = {}, {}
+	local Bindable = Instance.new("BindableEvent")
+
+	function Signal:Connect(Callback)
+		return Bindable.Event:Connect(function()
+			Callback(unpack(Arguments, 1, Arguments[0]))
+		end)
+	end
+
+	function Signal:Fire(...)
+		Arguments = {[0] = select("#", ...); ...}
+		Bindable:Fire()
+		Arguments = nil
+	end	
+
+	function Signal:Wait()
+		Bindable.Event:Wait()
+		return unpack(Arguments, 1, Arguments[0])
+	end
+
+	function Signal:Disconnect()
+		Bindable:Destroy()
+		Bindable, Arguments, Signal = nil
+	end
+
+	return Signal
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX37F330E16ACD4C21B175E705106BB32E">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">newThread</string>
+					<string name="ScriptGuid">{03148655-8FE8-4054-9563-75EA4717BF83}</string>
+					<ProtectedString name="Source"><![CDATA[return function(func,...)
+	local a = coroutine.wrap(func)
+	a(...)
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX163076755912474DA02D707B9DE53C97">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">newTween</string>
+					<string name="ScriptGuid">{ED6D43E0-55CC-4862-A358-88ECF1037F50}</string>
+					<ProtectedString name="Source"><![CDATA[return function(...)
+	local TweenService = game:GetService("TweenService")
+	local tween = TweenService:Create(...)
+	tween:Play()
+	return tween
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX4EB8863989364E879DCECFFBAA9A3D63">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">playSound</string>
+					<string name="ScriptGuid">{8512A1BF-A161-4405-A239-11B36E72B8BA}</string>
+					<ProtectedString name="Source"><![CDATA[local Debris = game:GetService("Debris")
+
+return function(sound, newSoundParent, despawnDelay)
+	local newSound = sound:Clone()
+	newSound.Parent = newSoundParent
+	newSound:Play()
+	Debris:AddItem(newSound, despawnDelay or sound.TimeLength)
+	return newSound
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXB1B327071A2543E0AA553B227F4A035D">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">round</string>
+					<string name="ScriptGuid">{2CD1DD8E-2C9D-489F-A594-AA9431ACC062}</string>
+					<ProtectedString name="Source"><![CDATA[return function(n, Places)
+	if not Places then
+		return math.floor(n + 0.5)
+	end
+	return math.floor((n * 10 ^ Places) + 0.5) / 10 ^ Places
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX9E0C21C7048F47C5B0051A47B7170781">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">tableRemove</string>
+					<string name="ScriptGuid">{03D565F1-3CC3-464C-A0B7-E8463AF8CBB3}</string>
+					<ProtectedString name="Source"><![CDATA[return function(Table, Value, RemoveCount)		
+	local Count = 0
+
+	if typeof(RemoveCount) == "number" then
+		for x = RemoveCount, 1, -1 do
+			if table.find(Table, Value) then
+				Count = Count + 1
+				table.remove(Table, table.find(Table, Value))	
+			end
+		end
+	elseif RemoveCount then
+		repeat
+			if table.find(Table, Value) then
+				Count = Count + 1	
+				table.remove(Table, table.find(Table, Value))	
+			end
+		until not table.find(Table, Value)
+	elseif not RemoveCount then
+		if table.find(Table, Value) then
+			Count = Count + 1
+			table.remove(Table, table.find(Table, Value))
+		end
+	end
+
+	return Count
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXBF5BC1CC1325426E956811693F6A1130">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">waitForPath</string>
-					<string name="ScriptGuid">{B1693DCB-5522-49E0-8D88-C76394F0F30D}</string>
+					<string name="ScriptGuid">{6662276E-B2FF-447C-9BB8-584DA72F9C4F}</string>
 					<ProtectedString name="Source"><![CDATA[return function(target, path, maxWait)
 
 	local BAD_ARG_ERROR="%s is not a valid %s"
@@ -18639,210 +18852,17 @@ end]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXB212BB31BD584BD8B46B3EDEECA3EDA4">
+			<Item class="ModuleScript" referent="RBX30E289CE0987442F97F2D75547B0BD21">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">mag</string>
-					<string name="ScriptGuid">{586BFD77-B50B-43AB-91F3-0ECE5052F5BE}</string>
-					<ProtectedString name="Source"><![CDATA[return function(Start, End)
-
-	if typeof(Start) ~= "Vector3" then
-		Start = Start.Position
-	end
-
-	if typeof(End) ~= "Vector3" then
-		End = End.Position
-	end	
-
-	return (Start-End).Magnitude
-end]]></ProtectedString>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX6E7A7B2DAA6A420395AFDB22E9689BC6">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">newThread</string>
-					<string name="ScriptGuid">{2A1742DF-1CD3-4568-9262-502881AB812D}</string>
-					<ProtectedString name="Source"><![CDATA[return function(func,...)
-	local a = coroutine.wrap(func)
-	a(...)
-end]]></ProtectedString>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX7BA1846E1B684312986801E781D16BC8">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">tableRemove</string>
-					<string name="ScriptGuid">{E892898F-E3B7-41A5-9949-24329CEDAFB9}</string>
-					<ProtectedString name="Source"><![CDATA[return function(Table, Value, RemoveCount)		
-	local Count = 0
-
-	if typeof(RemoveCount) == "number" then
-		for x = RemoveCount, 1, -1 do
-			if table.find(Table, Value) then
-				Count = Count + 1
-				table.remove(Table, table.find(Table, Value))	
-			end
-		end
-	elseif RemoveCount then
-		repeat
-			if table.find(Table, Value) then
-				Count = Count + 1	
-				table.remove(Table, table.find(Table, Value))	
-			end
-		until not table.find(Table, Value)
-	elseif not RemoveCount then
-		if table.find(Table, Value) then
-			Count = Count + 1
-			table.remove(Table, table.find(Table, Value))
-		end
-	end
-
-	return Count
-end]]></ProtectedString>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXEB294C55CB8A437C87E1374DDAE26FF2">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">newEvent</string>
-					<string name="ScriptGuid">{A170D619-CCC2-46BE-BE95-F318A86F54EF}</string>
-					<ProtectedString name="Source"><![CDATA[return function()
-	local Signal, Arguments = {}, {}
-	local Bindable = Instance.new("BindableEvent")
-
-	function Signal:Connect(Callback)
-		return Bindable.Event:Connect(function()
-			Callback(unpack(Arguments, 1, Arguments[0]))
-		end)
-	end
-
-	function Signal:Fire(...)
-		Arguments = {[0] = select("#", ...); ...}
-		Bindable:Fire()
-		Arguments = nil
-	end	
-
-	function Signal:Wait()
-		Bindable.Event:Wait()
-		return unpack(Arguments, 1, Arguments[0])
-	end
-
-	function Signal:Disconnect()
-		Bindable:Destroy()
-		Bindable, Arguments, Signal = nil
-	end
-
-	return Signal
-end]]></ProtectedString>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX35BB837F54FD4A7DBE4802D055F4C3E3">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">newTween</string>
-					<string name="ScriptGuid">{F027AD66-4450-4222-8554-073E08DFB1F5}</string>
-					<ProtectedString name="Source"><![CDATA[return function(...)
-	local TweenService = game:GetService("TweenService")
-	local tween = TweenService:Create(...)
-	tween:Play()
-	return tween
-end]]></ProtectedString>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX77EE1C135687442CA247B5B2B5C27A69">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">cloneTable</string>
-					<string name="ScriptGuid">{829AA367-2459-4648-A37F-E599B28177E0}</string>
-					<ProtectedString name="Source"><![CDATA[local core = require(script.Parent)
-local cloneTable = core("cloneTable")
-
-return function(OriginalTable)
-	local copy = {}
-	for k, v in pairs(OriginalTable) do
-		if type(v) == "table" then
-			v = cloneTable(v)
-		end
-		copy[k] = v
-	end
-	return copy
-end]]></ProtectedString>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXAD30A23D859C4FB38250E6B320EF65C0">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">collection</string>
-					<string name="ScriptGuid">{C03C37FE-912F-4657-9A76-82C6BA54F910}</string>
-					<ProtectedString name="Source"><![CDATA[local core = require(script.Parent)
-local newThread = core("newThread")
-
-return function(tag, func)
-	local CollectionService = game:GetService("CollectionService")
-
-	for _,obj in pairs(CollectionService:GetTagged(tag)) do
-		newThread(func, obj)
-	end
-
-	CollectionService:GetInstanceAddedSignal(tag):Connect(function(obj)
-		newThread(func, obj)
-	end)
-end]]></ProtectedString>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBXFC0BC04C7FA3450FAA797C8B7C27C930">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">playSound</string>
-					<string name="ScriptGuid">{ECBE6DFB-E015-45C5-864E-377A3DE1D482}</string>
-					<ProtectedString name="Source"><![CDATA[local Debris = game:GetService("Debris")
-
-return function(sound, newSoundParent, despawnDelay)
-	local newSound = sound:Clone()
-	newSound.Parent = newSoundParent
-	newSound:Play()
-	Debris:AddItem(newSound, despawnDelay or sound.TimeLength)
-	return newSound
-end]]></ProtectedString>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-				</Properties>
-			</Item>
-			<Item class="ModuleScript" referent="RBX0679B08FDB474590953F6CBE73423246">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">disconnectCon</string>
-					<string name="ScriptGuid">{11EF129E-0A29-4C75-BFA6-2CEDB747F9DC}</string>
-					<ProtectedString name="Source"><![CDATA[return function(connections)
-	for _,con in pairs(connections) do
-		if con then
-			con:Disconnect()
-		end
-	end
+					<string name="Name">randomnum</string>
+					<string name="ScriptGuid">{0A606C5D-E8AF-4714-A909-99C281D55DA9}</string>
+					<ProtectedString name="Source"><![CDATA[return function(min, max, multiplier)
+    if not multiplier then
+        multiplier = 1
+    end
+    return math.random(min * 10 ^ multiplier, max * 10 ^ multiplier) / 10 ^ multiplier
 end]]></ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
