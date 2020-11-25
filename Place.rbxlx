@@ -63,27 +63,27 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>-25.3746433</X>
-					<Y>34.5111351</Y>
-					<Z>9.44398785</Z>
-					<R00>-0.998113394</R00>
-					<R01>0.0112524936</R01>
-					<R02>-0.06035804</R02>
-					<R10>9.31322464e-10</R10>
-					<R11>0.983062446</R11>
-					<R12>0.183271393</R12>
-					<R20>0.0613979772</R20>
-					<R21>0.182925627</R21>
-					<R22>-0.981207728</R22>
+					<X>-32.0001488</X>
+					<Y>17.8324547</Y>
+					<Z>-145.894958</Z>
+					<R00>-0.972639024</R00>
+					<R01>-0.136550695</R01>
+					<R02>0.187955886</R02>
+					<R10>7.45058149e-09</R10>
+					<R11>0.809031963</R11>
+					<R12>0.5877648</R12>
+					<R20>-0.232322007</R20>
+					<R21>0.57168299</R21>
+					<R22>-0.786895871</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>-25.2539272</X>
-					<Y>34.1445923</Y>
-					<Z>11.4064035</Z>
+					<X>-32.3760605</X>
+					<Y>16.6569252</Y>
+					<Z>-144.321167</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -3996,6 +3996,14 @@ gcLgc4RKxr21zq2UlJSM]]></BinaryString>
 					<bool name="UseJumpPower">true</bool>
 					<float name="WalkSpeed">16</float>
 				</Properties>
+				<Item class="Animator" referent="RBX4F7528D331074034B87D2885F7B7B458">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Animator</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
 			</Item>
 			<Item class="Part" referent="RBXF121D2624DA34E8BA3C08ACA8742E963">
 				<Properties>
@@ -13452,14 +13460,14 @@ return module]]></ProtectedString>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="Folder" referent="RBX3C040010E0B74FB38E33E68039A59B22">
+					<Item class="Folder" referent="RBXB60658EFF0B64818ABE7631571A2B5C9">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Animations</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="Animation" referent="RBXEB4A3590A8614E9E8864E3A0D86EECA5">
+						<Item class="Animation" referent="RBXD88C204E0498454A86137ACB6243A8B5">
 							<Properties>
 								<Content name="AnimationId"><url>rbxassetid://5942095379</url></Content>
 								<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13468,7 +13476,7 @@ return module]]></ProtectedString>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="Animation" referent="RBXD81063E7902142B49BFCD8FB28B78472">
+						<Item class="Animation" referent="RBX7CECC54A69D641A8AAA66B57B8B80057">
 							<Properties>
 								<Content name="AnimationId"><url>rbxassetid://5942095899</url></Content>
 								<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13477,7 +13485,7 @@ return module]]></ProtectedString>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="Animation" referent="RBX076A0ECC3FBC40BAB9F6556B64A29BAE">
+						<Item class="Animation" referent="RBX2A85883A55524D4DBFC86A31122A1180">
 							<Properties>
 								<Content name="AnimationId"><url>rbxassetid://5942094624</url></Content>
 								<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13487,14 +13495,14 @@ return module]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBXF950AFA7499D4A6CB7062009912F271A">
+					<Item class="Folder" referent="RBX60F4E0DA6671442F8A29FF9C61C3AFC9">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">UI</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="BillboardGui" referent="RBX8D06FF049FA0475385C45182888B1917">
+						<Item class="BillboardGui" referent="RBX4A2BB8F13A1F44299F81452FD6E9B849">
 							<Properties>
 								<bool name="Active">true</bool>
 								<Ref name="Adornee">null</Ref>
@@ -13546,7 +13554,7 @@ return module]]></ProtectedString>
 								<BinaryString name="Tags"></BinaryString>
 								<token name="ZIndexBehavior">1</token>
 							</Properties>
-							<Item class="TextLabel" referent="RBX2D1A13B08ECB479EB088CF0D8848C4FF">
+							<Item class="TextLabel" referent="RBX9F17A011E4204DA5BFA05F83FD52D5C9">
 								<Properties>
 									<bool name="Active">false</bool>
 									<Vector2 name="AnchorPoint">
@@ -13902,14 +13910,14 @@ return module]]></ProtectedString>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="Folder" referent="RBX8050D8DF10D0419EB80DD2D253D3C372">
+					<Item class="Folder" referent="RBX556C1E873B9B41CDAD6E07E0C98106DB">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Animations</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="Animation" referent="RBX90D7499369B74136BA5A411737EDA105">
+						<Item class="Animation" referent="RBX98A4407C39214B13B50F02A1A811E55B">
 							<Properties>
 								<Content name="AnimationId"><url>rbxassetid://5956034919</url></Content>
 								<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13918,7 +13926,7 @@ return module]]></ProtectedString>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="Animation" referent="RBXD9E4AAB98C6B4987B7342F36B09F5318">
+						<Item class="Animation" referent="RBXE7BB27B5DCBA4EEA8D1D3E1CA7B52699">
 							<Properties>
 								<Content name="AnimationId"><url>rbxassetid://5956036222</url></Content>
 								<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13927,7 +13935,7 @@ return module]]></ProtectedString>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="Animation" referent="RBX643D4CE84FDB401AB54ADD118D6D85EE">
+						<Item class="Animation" referent="RBX3DBDAAE80D0D4B72AEF1862AAE404B7E">
 							<Properties>
 								<Content name="AnimationId"><url>rbxassetid://5956033845</url></Content>
 								<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13937,14 +13945,14 @@ return module]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBX03E578C753214D839FD6469E8E94ACFF">
+					<Item class="Folder" referent="RBX7FAA7FBDD9FA436FA676F47A50A8BF63">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">UI</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="BillboardGui" referent="RBX359ABCB81F004E879DCA172514CCA6C6">
+						<Item class="BillboardGui" referent="RBXA4706176D86947A3BBAB44F3544D3A40">
 							<Properties>
 								<bool name="Active">true</bool>
 								<Ref name="Adornee">null</Ref>
@@ -13996,7 +14004,457 @@ return module]]></ProtectedString>
 								<BinaryString name="Tags"></BinaryString>
 								<token name="ZIndexBehavior">1</token>
 							</Properties>
-							<Item class="TextLabel" referent="RBX6A7E8DD450904404BD4E24256A9AAA11">
+							<Item class="TextLabel" referent="RBXCBE71B2516A14BCD820D7047D8C17695">
+								<Properties>
+									<bool name="Active">false</bool>
+									<Vector2 name="AnchorPoint">
+										<X>0</X>
+										<Y>0</Y>
+									</Vector2>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<bool name="AutoLocalize">true</bool>
+									<token name="AutomaticSize">0</token>
+									<Color3 name="BackgroundColor3">
+										<R>1</R>
+										<G>1</G>
+										<B>1</B>
+									</Color3>
+									<float name="BackgroundTransparency">1</float>
+									<Color3 name="BorderColor3">
+										<R>0.105882362</R>
+										<G>0.164705887</G>
+										<B>0.207843155</B>
+									</Color3>
+									<token name="BorderMode">0</token>
+									<int name="BorderSizePixel">1</int>
+									<bool name="ClipsDescendants">false</bool>
+									<bool name="Draggable">false</bool>
+									<token name="Font">18</token>
+									<int name="LayoutOrder">0</int>
+									<float name="LineHeight">1</float>
+									<string name="Name">TextLabel</string>
+									<Ref name="NextSelectionDown">null</Ref>
+									<Ref name="NextSelectionLeft">null</Ref>
+									<Ref name="NextSelectionRight">null</Ref>
+									<Ref name="NextSelectionUp">null</Ref>
+									<UDim2 name="Position">
+										<XS>0</XS>
+										<XO>0</XO>
+										<YS>0</YS>
+										<YO>0</YO>
+									</UDim2>
+									<bool name="RichText">false</bool>
+									<Ref name="RootLocalizationTable">null</Ref>
+									<float name="Rotation">0</float>
+									<bool name="Selectable">false</bool>
+									<Ref name="SelectionImageObject">null</Ref>
+									<UDim2 name="Size">
+										<XS>1</XS>
+										<XO>0</XO>
+										<YS>1</YS>
+										<YO>0</YO>
+									</UDim2>
+									<token name="SizeConstraint">0</token>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<string name="Text">45</string>
+									<Color3 name="TextColor3">
+										<R>1</R>
+										<G>1</G>
+										<B>1</B>
+									</Color3>
+									<bool name="TextScaled">true</bool>
+									<float name="TextSize">30</float>
+									<Color3 name="TextStrokeColor3">
+										<R>0</R>
+										<G>0</G>
+										<B>0</B>
+									</Color3>
+									<float name="TextStrokeTransparency">0.699999988</float>
+									<float name="TextTransparency">0</float>
+									<token name="TextTruncate">0</token>
+									<bool name="TextWrapped">true</bool>
+									<token name="TextXAlignment">2</token>
+									<token name="TextYAlignment">1</token>
+									<bool name="Visible">true</bool>
+									<int name="ZIndex">1</int>
+								</Properties>
+							</Item>
+						</Item>
+					</Item>
+				</Item>
+				<Item class="ModuleScript" referent="RBX03F8BF53AA6A4715BC4F3597C4DC5ACD">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Shotgun</string>
+						<string name="ScriptGuid">{F751DB78-2600-423E-B1BF-AB5CE960F736}</string>
+						<ProtectedString name="Source"><![CDATA[local module = {}
+module.__index = module
+
+-- // VARIABLES \\ --
+
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Debris = game:GetService("Debris")
+
+local Settings = require(game.ReplicatedStorage.Settings[script.Name])
+local Core = require(game.ReplicatedStorage.Core)
+local waitForPath = Core("waitForPath")
+local newThread = Core("newThread")
+local newTween = Core("newTween")
+local playSound = Core("playSound")
+local disconnectCon = Core("disconnectCon")
+local randomnum = Core("randomnum")
+
+local p = game.Players.LocalPlayer
+
+-- // FUNCTIONS \\ --
+
+function module:invokeRemote(remote, ...)
+	local success, msg = remote:InvokeServer(...)
+	if msg and Settings.willDebug then
+		if success then
+			print(msg)
+		else
+			warn(msg)
+		end
+	end
+	return success, msg
+end
+
+-- indirect
+
+function module:updateMouseIcon()
+	if self.temp.mouse and not self.tool.tool.Parent:IsA("Backpack") then
+		self.temp.mouse.Icon = Settings.mouseIcon
+	end
+end
+
+function module:shootGun()
+	self.temp.timeOfRecentFire = os.clock()
+	local success, errorMsg = self:invokeRemote(self.tool.remotes.MouseEvent, self.temp.mouse.Hit.Position)
+	if errorMsg ~= "NO_AMMO" then
+		self.anims.shootAnim:Play()
+	end
+end
+
+function module:reloadGun()
+	self.anims.reloadAnim:Play()
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "reload")
+end
+
+function module:initEvents()
+	disconnectCon(self.temp.connections)
+
+	self.temp.connections.currentOnInputBegan = UserInputService.InputBegan:Connect(function(...)
+		self:onInputBegan(...)
+	end)
+
+	if self.tool.fireMode.Value == "auto" then	
+		self.temp.connections.currentOnInputEnded = UserInputService.InputEnded:Connect(function(...)
+			self:onInputEnded(...)
+		end)
+	
+		self.temp.connections.currentOnStepped = RunService.Stepped:Connect(function(...)
+			self:onStepped(...)
+		end)
+	end
+end
+
+-- service events
+
+function module:onStepped()
+	if self.temp.isMouseDown and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
+		self:shootGun()
+	end
+end
+
+function module:onInputBegan(input, gameProcessed)
+	if gameProcessed or not self.temp.expectingInput or not self.temp.mouse then
+		return
+	end
+
+	if input.UserInputType == Settings.keybinds.shoot and self.tool.fireMode.Value ~= "safety" then	
+		if self.tool.fireMode.Value == "auto" then
+			self.temp.isMouseDown = true
+		elseif self.tool.fireMode.Value == "semi" or self.tool.fireMode.Value == "burst" and os.clock() - self.temp.timeOfRecentFire >= 60 / Settings.fireRate then
+			self:shootGun()
+		end	
+	elseif input.KeyCode == Settings.keybinds.reload then
+		self.temp.isMouseDown = false
+		self:reloadGun()
+	elseif input.KeyCode == Settings.keybinds.fireMode then
+		local oldFireMode = self.tool.fireMode.Value
+		local newFireMode = self.tool.remotes.ChangeFireMode:InvokeServer()
+		if newFireMode and newFireMode ~= oldFireMode then
+			self:updateUI()
+			self:initEvents()
+		end
+	end		
+end
+
+function module:onInputEnded(input, gamehandledEvent)
+	if gamehandledEvent or not self.temp.expectingInput or not self.temp.mouse then
+		return
+	end
+
+	if input.UserInputType == Settings.keybinds.shoot then
+		self.temp.isMouseDown = false
+	end
+end
+
+-- instance events
+
+function module:onToolEquip(playerMouse)
+	self.temp.mouse = playerMouse
+	self.temp.expectingInput = true
+	self.temp.isMouseDown = false
+
+	newThread(function()
+		self:updateUI()
+	end)
+
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.shownPos})
+	self:updateMouseIcon()
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "equip")
+	self.anims.holdAnim:Play()
+	self:initEvents()
+end
+
+function module:onToolUnequip()
+
+	self.temp.expectingInput = false
+	self.temp.isMouseDown = false
+
+	newTween(self.UI.gunInfoUI, Settings.UI.GunInfo.tweenInfo, {Position = Settings.UI.GunInfo.hiddenPos})
+	self:updateMouseIcon()
+	self:invokeRemote(self.tool.remotes.ChangeStatus, "unequip")
+	self.anims.holdAnim:Stop()
+	disconnectCon(self.temp.connections)
+end
+
+function module:updateUI()
+	local UI = self.UI.gunInfoUI
+	local currentAmmoText = '<font size="100"><font color = "rgb(255, 255, 255)">' .. self.tool.ammo.Value .. '</font></font>'
+	local currentMaxAmmoText = '<font size="60"><font color = "rgb(200, 200, 200)">/' .. Settings.maxAmmo .. '</font></font>'
+
+	newTween(UI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 1}).Completed:Wait()
+	UI.Ammo.Text = currentAmmoText .. currentMaxAmmoText
+	UI.FireMode.Text = self.tool.fireMode.Value:upper()
+	UI.Weapon.Text = script.Name:upper()
+	newTween(UI.Ammo, Settings.UI.textFlashTweenInfo, {TextTransparency = 0})
+end
+
+function module:showDamageDealt(receiver, damageType, amount)
+	local root = receiver:FindFirstChild("HumanoidRootPart")
+	if root then
+		local newIndicator = self.UI.toolUI.DamageIndicator:Clone() do
+			newIndicator.TextLabel.Text = amount
+
+			for propertyName, propertyValue in pairs(Settings.UI.DamageIndicator[damageType]) do
+				newIndicator.TextLabel[propertyName] = propertyValue
+			end
+
+			newIndicator.Enabled = true
+			newIndicator.Parent = root 
+
+			local minOffset = Settings.UI.DamageIndicator.minOffset
+			local maxOffset = Settings.UI.DamageIndicator.minOffset
+			newIndicator.StudsOffset = Vector3.new(
+				randomnum(minOffset.X, maxOffset.X, 10),
+				randomnum(minOffset.Y, maxOffset.Y, 10),
+				0
+			)
+		end
+
+		playSound(self.sounds.hitSound, self.tool.handle)
+
+		Debris:AddItem(newIndicator, Settings.UI.DamageIndicator.maxduration)
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 0}).Completed:Wait()
+		newTween(newIndicator.TextLabel, Settings.UI.DamageIndicator.tweenInfo, {TextTransparency = 1})
+	end	
+end
+
+function module:charDied()
+	disconnectCon(self.temp.connections)
+end
+
+-- // INIT \\ --
+
+function module.init(tool)
+	
+	-- create dictionary
+	
+	local self = {}
+	self = {
+		player = {
+			char = p.Character or p.CharacterAdded:Wait(),
+			hum = p.Character:WaitForChild("Humanoid"),
+		},
+		tool = {
+			tool = tool,
+			handle = tool:WaitForChild("Handle"),
+			ammo = waitForPath(tool, "Values.Ammo"),
+			fireMode = waitForPath(tool, "Values.FireMode"),
+			remotes = tool:WaitForChild("Remotes"),
+		},
+		anims = {
+			holdAnim = p.Character.Humanoid:LoadAnimation(waitForPath(script, "Animations.Hold")),
+			shootAnim = p.Character.Humanoid:LoadAnimation(script.Animations:WaitForChild("Shoot")),
+			reloadAnim = p.Character.Humanoid:LoadAnimation(script.Animations:WaitForChild("Reload")),
+		},		
+		UI = {
+			gunInfoUI = waitForPath(p.PlayerGui, "GunInfo.Frame"), 
+			toolUI = script:WaitForChild("UI"),
+		},
+		sounds = {
+			hitSound = tool.Handle:WaitForChild("Hit")
+		},		
+		temp = {
+			timeOfRecentFire = os.clock(),
+			mouse = nil,
+			expectingInput = nil,
+			isMouseDown = nil,
+
+			connections = {
+				currentOnInputBegan = nil,
+				currentOnInputEnded = nil,
+				currentOnStepped = nil,
+			}
+		}	
+	}
+	setmetatable(self, module)
+	
+	-- events
+	
+	self.tool.tool.Equipped:Connect(function(...)
+		self:onToolEquip(...)
+	end)
+	
+	self.tool.tool.Unequipped:Connect(function(...)
+		self:onToolUnequip(...)
+	end)
+	
+	self.tool.ammo.Changed:Connect(function()
+		self:updateUI()
+	end)
+	
+	self.tool.remotes:WaitForChild("DamageDealt").OnClientEvent:Connect(function(...)
+		self:showDamageDealt(...)
+	end)
+	
+	self.player.hum.Died:Connect(function()
+		self:charDied()
+	end)
+
+	-- compile
+
+	self:updateUI()
+	self.UI.gunInfoUI.Visible = true
+	self.UI.gunInfoUI.Position = Settings.UI.GunInfo.hiddenPos
+	
+end
+
+return module]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="Folder" referent="RBX3B55413ED20546539E746481100EEE3A">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Animations</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+						<Item class="Animation" referent="RBX5C5AC41462C44A50B2E3FF61A72372D9">
+							<Properties>
+								<Content name="AnimationId"><url>rbxassetid://5956034919</url></Content>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<string name="Name">Shoot</string>
+								<int64 name="SourceAssetId">-1</int64>
+								<BinaryString name="Tags"></BinaryString>
+							</Properties>
+						</Item>
+						<Item class="Animation" referent="RBXBDFACD86ACC3422B822B58CE7209B992">
+							<Properties>
+								<Content name="AnimationId"><url>rbxassetid://5956036222</url></Content>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<string name="Name">Reload</string>
+								<int64 name="SourceAssetId">-1</int64>
+								<BinaryString name="Tags"></BinaryString>
+							</Properties>
+						</Item>
+						<Item class="Animation" referent="RBX4E019B38D32D41A1A8AED011D4CA963D">
+							<Properties>
+								<Content name="AnimationId"><url>rbxassetid://5956033845</url></Content>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<string name="Name">Hold</string>
+								<int64 name="SourceAssetId">-1</int64>
+								<BinaryString name="Tags"></BinaryString>
+							</Properties>
+						</Item>
+					</Item>
+					<Item class="Folder" referent="RBX56F9DCB4690842249CB176DE018FB7F6">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">UI</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+						<Item class="BillboardGui" referent="RBX0DF1B6289BEE46988999F1FCE37EC1E2">
+							<Properties>
+								<bool name="Active">true</bool>
+								<Ref name="Adornee">null</Ref>
+								<bool name="AlwaysOnTop">true</bool>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<bool name="AutoLocalize">true</bool>
+								<bool name="ClipsDescendants">true</bool>
+								<float name="DistanceLowerLimit">0</float>
+								<float name="DistanceStep">0</float>
+								<float name="DistanceUpperLimit">-1</float>
+								<bool name="Enabled">false</bool>
+								<Vector3 name="ExtentsOffset">
+									<X>0</X>
+									<Y>0</Y>
+									<Z>0</Z>
+								</Vector3>
+								<Vector3 name="ExtentsOffsetWorldSpace">
+									<X>0</X>
+									<Y>0</Y>
+									<Z>0</Z>
+								</Vector3>
+								<float name="LightInfluence">0</float>
+								<float name="MaxDistance">INF</float>
+								<string name="Name">DamageIndicator</string>
+								<Ref name="PlayerToHideFrom">null</Ref>
+								<bool name="ResetOnSpawn">true</bool>
+								<Ref name="RootLocalizationTable">null</Ref>
+								<UDim2 name="Size">
+									<XS>0</XS>
+									<XO>50</XO>
+									<YS>0</YS>
+									<YO>25</YO>
+								</UDim2>
+								<Vector2 name="SizeOffset">
+									<X>0</X>
+									<Y>0</Y>
+								</Vector2>
+								<int64 name="SourceAssetId">-1</int64>
+								<Vector3 name="StudsOffset">
+									<X>1</X>
+									<Y>1</Y>
+									<Z>0</Z>
+								</Vector3>
+								<Vector3 name="StudsOffsetWorldSpace">
+									<X>0</X>
+									<Y>0</Y>
+									<Z>0</Z>
+								</Vector3>
+								<BinaryString name="Tags"></BinaryString>
+								<token name="ZIndexBehavior">1</token>
+							</Properties>
+							<Item class="TextLabel" referent="RBXD6B5EDF4CC8A4460B44A14772411DD7E">
 								<Properties>
 									<bool name="Active">false</bool>
 									<Vector2 name="AnchorPoint">
@@ -16611,7 +17069,7 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 						<bool name="Playing">false</bool>
 						<token name="RollOffMode">0</token>
 						<Ref name="SoundGroup">null</Ref>
-						<Content name="SoundId"><url>rbxassetid://3821787597</url></Content>
+						<Content name="SoundId"><url>rbxassetid://5619146413</url></Content>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 						<double name="TimePosition">0</double>
@@ -16930,6 +17388,781 @@ charCon = p.CharacterAdded:Connect(charAdded)]]></ProtectedString>
 						<Z>0.561310232</Z>
 					</Vector3>
 				</Properties>
+			</Item>
+		</Item>
+		<Item class="Tool" referent="RBXA324DF661E1B4A719E2D5BB81FF98A68">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="CanBeDropped">true</bool>
+				<bool name="Enabled">true</bool>
+				<CoordinateFrame name="Grip">
+					<X>0.021484375</X>
+					<Y>-0.549581051</Y>
+					<Z>-0.330001831</Z>
+					<R00>-0.996953964</R00>
+					<R01>-0.0779924989</R01>
+					<R02>0</R02>
+					<R10>-0.0779924989</R10>
+					<R11>0.996953964</R11>
+					<R12>0</R12>
+					<R20>-0</R20>
+					<R21>0</R21>
+					<R22>-1</R22>
+				</CoordinateFrame>
+				<bool name="ManualActivationOnly">false</bool>
+				<string name="Name">Shotgun</string>
+				<bool name="RequiresHandle">true</bool>
+				<int64 name="SourceAssetId">4842215723</int64>
+				<BinaryString name="Tags">V2VhcG9uc1N5c3RlbVdlYXBvbgBTaG90Z3VuAEd1bg==</BinaryString>
+				<Content name="TextureId"><null></null></Content>
+				<string name="ToolTip"></string>
+			</Properties>
+			<Item class="Part" referent="RBXCA4232040DA74806A9627BA45336B3F2">
+				<Properties>
+					<bool name="Anchored">false</bool>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-38.8778343</X>
+						<Y>6.06890869</Y>
+						<Z>-107.127205</Z>
+						<R00>0</R00>
+						<R01>0</R01>
+						<R02>-1</R02>
+						<R10>-0.0390260145</R10>
+						<R11>0.999238372</R11>
+						<R12>0</R12>
+						<R20>0.999238372</R20>
+						<R21>0.0390260033</R21>
+						<R22>0</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">false</bool>
+					<bool name="CastShadow">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">256</token>
+					<string name="Name">Handle</string>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">-127</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">1</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<token name="formFactorRaw">1</token>
+					<token name="shape">1</token>
+					<Vector3 name="size">
+						<X>0.5</X>
+						<Y>1</Y>
+						<Z>3</Z>
+					</Vector3>
+				</Properties>
+				<Item class="Sound" referent="RBXB53B0FA7D0DE4D54992DCE5F4F6ECF39">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Fired</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://3821792787</url></Content>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">0.5</float>
+						<float name="xmlRead_MaxDistance_3">10000</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX14AA3A18F3F24599A3364D74E92199B4">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Reload</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://3821792115</url></Content>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">0.5</float>
+						<float name="xmlRead_MaxDistance_3">10000</float>
+					</Properties>
+				</Item>
+				<Item class="ParticleEmitter" referent="RBX99756550FA8E46408B877D1CBDC95EB6">
+					<Properties>
+						<Vector3 name="Acceleration">
+							<X>0</X>
+							<Y>-60</Y>
+							<Z>0</Z>
+						</Vector3>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<ColorSequence name="Color">0 0.196078 0.196078 0.196078 0 1 0.196078 0.196078 0.196078 0 </ColorSequence>
+						<float name="Drag">0</float>
+						<token name="EmissionDirection">5</token>
+						<bool name="Enabled">false</bool>
+						<NumberRange name="Lifetime">0.25 0.75 </NumberRange>
+						<float name="LightEmission">0</float>
+						<float name="LightInfluence">0</float>
+						<bool name="LockedToPart">false</bool>
+						<string name="Name">ImpactParticle</string>
+						<float name="Rate">120</float>
+						<NumberRange name="RotSpeed">0 0 </NumberRange>
+						<NumberRange name="Rotation">-180 180 </NumberRange>
+						<NumberSequence name="Size">0 0.5 0 0.982 0.3 0 1 0 0 </NumberSequence>
+						<int64 name="SourceAssetId">-1</int64>
+						<NumberRange name="Speed">30 30 </NumberRange>
+						<Vector2 name="SpreadAngle">
+							<X>30</X>
+							<Y>30</Y>
+						</Vector2>
+						<BinaryString name="Tags"></BinaryString>
+						<Content name="Texture"><url>rbxassetid://1082139505</url></Content>
+						<NumberSequence name="Transparency">0 0 0 1 0 0 </NumberSequence>
+						<float name="VelocityInheritance">0</float>
+						<float name="ZOffset">0</float>
+					</Properties>
+				</Item>
+				<Item class="Beam" referent="RBXA9221D52033F4137B8ED00F62EBA1E56">
+					<Properties>
+						<Ref name="Attachment0">RBX1814899A392A4D2FA7F107E9872BEA8E</Ref>
+						<Ref name="Attachment1">RBX35FBBC709CF5457899CED7C9556F8186</Ref>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<ColorSequence name="Color">0 0.839216 0.670588 0 0 1 1 0.917647 0.435294 0 </ColorSequence>
+						<float name="CurveSize0">0</float>
+						<float name="CurveSize1">0</float>
+						<bool name="Enabled">false</bool>
+						<bool name="FaceCamera">false</bool>
+						<float name="LightEmission">1</float>
+						<float name="LightInfluence">0</float>
+						<string name="Name">MuzzleFlash</string>
+						<int name="Segments">5</int>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<Content name="Texture"><url>rbxassetid://872910628</url></Content>
+						<float name="TextureLength">1</float>
+						<token name="TextureMode">0</token>
+						<float name="TextureSpeed">0</float>
+						<NumberSequence name="Transparency">0 0 0 1 0 0 </NumberSequence>
+						<float name="Width0">1</float>
+						<float name="Width1">1</float>
+						<float name="ZOffset">0</float>
+					</Properties>
+				</Item>
+				<Item class="Attachment" referent="RBX1814899A392A4D2FA7F107E9872BEA8E">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="CFrame">
+							<X>-0.512466431</X>
+							<Y>0.319756985</Y>
+							<Z>3.2016449</Z>
+							<R00>-5.96046661e-08</R00>
+							<R01>-1.11758691e-08</R01>
+							<R02>-1</R02>
+							<R10>6.66133815e-16</R10>
+							<R11>1</R11>
+							<R12>-1.11758691e-08</R12>
+							<R20>1</R20>
+							<R21>-1.33226774e-15</R21>
+							<R22>-5.96046661e-08</R22>
+						</CoordinateFrame>
+						<string name="Name">MuzzleFlash0</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+				<Item class="Attachment" referent="RBX35FBBC709CF5457899CED7C9556F8186">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="CFrame">
+							<X>0.487510681</X>
+							<Y>0.319756031</Y>
+							<Z>3.2016449</Z>
+							<R00>-4.17232627e-07</R00>
+							<R01>-1.03563059e-06</R01>
+							<R02>-1</R02>
+							<R10>3.55271368e-15</R10>
+							<R11>1</R11>
+							<R12>-1.03563059e-06</R12>
+							<R20>1</R20>
+							<R21>-4.35651596e-13</R21>
+							<R22>-4.17232627e-07</R22>
+						</CoordinateFrame>
+						<string name="Name">MuzzleFlash1</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+				<Item class="Attachment" referent="RBX34AE8A39449E4D90A6F95A877BCF65AE">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="CFrame">
+							<X>-0.047996521</X>
+							<Y>0.318999767</Y>
+							<Z>3.14633179</Z>
+							<R00>-1</R00>
+							<R01>3.72528985e-09</R01>
+							<R02>-8.74227695e-08</R02>
+							<R10>3.72528985e-09</R10>
+							<R11>1</R11>
+							<R12>-3.25675168e-16</R12>
+							<R20>8.74227695e-08</R20>
+							<R21>-6.51350337e-16</R21>
+							<R22>-1</R22>
+						</CoordinateFrame>
+						<string name="Name">GunFirePoint</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<bool name="Visible">false</bool>
+					</Properties>
+				</Item>
+				<Item class="SpotLight" referent="RBX326B80B8C190472482414585EBF429FA">
+					<Properties>
+						<float name="Angle">120</float>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="Brightness">3</float>
+						<Color3 name="Color">
+							<R>1</R>
+							<G>0.917647064</G>
+							<B>0.435294122</B>
+						</Color3>
+						<bool name="Enabled">false</bool>
+						<token name="Face">5</token>
+						<string name="Name">MuzzleLight</string>
+						<float name="Range">20</float>
+						<bool name="Shadows">true</bool>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="Smoke" referent="RBX01691E2A1BA841A6B23A28AB601C302D">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Color3 name="Color">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<bool name="Enabled">false</bool>
+						<string name="Name">Smoke</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="opacity_xml">0.00999999978</float>
+						<float name="riseVelocity_xml">1</float>
+						<float name="size_xml">0.100000001</float>
+					</Properties>
+				</Item>
+				<Item class="Weld" referent="RBXE9F1F46A40CB46329BD67FF8615061A0">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="C0">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0.75</Z>
+							<R00>1.00000012</R00>
+							<R01>-3.7252903e-09</R01>
+							<R02>0</R02>
+							<R10>-3.7252903e-09</R10>
+							<R11>1.00000012</R11>
+							<R12>0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<CoordinateFrame name="C1">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+							<R00>1</R00>
+							<R01>0</R01>
+							<R02>0</R02>
+							<R10>0</R10>
+							<R11>1</R11>
+							<R12>0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<bool name="Enabled">true</bool>
+						<string name="Name">Shotgun</string>
+						<Ref name="Part0">RBXCA4232040DA74806A9627BA45336B3F2</Ref>
+						<Ref name="Part1">RBXB639FF5194AA4B2AB6897019EFEFDC58</Ref>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="Weld" referent="RBXEA6C12F5444247ECB3E0FE474BDF0D35">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<CoordinateFrame name="C0">
+							<X>-0.0462875366</X>
+							<Y>0.210823059</Y>
+							<Z>1.25162888</Z>
+							<R00>1.00000012</R00>
+							<R01>-3.7252903e-09</R01>
+							<R02>0</R02>
+							<R10>-3.7252903e-09</R10>
+							<R11>1.00000012</R11>
+							<R12>0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<CoordinateFrame name="C1">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>0</Z>
+							<R00>1</R00>
+							<R01>0</R01>
+							<R02>0</R02>
+							<R10>0</R10>
+							<R11>1</R11>
+							<R12>0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<bool name="Enabled">true</bool>
+						<string name="Name">Pump</string>
+						<Ref name="Part0">RBXCA4232040DA74806A9627BA45336B3F2</Ref>
+						<Ref name="Part1">RBX311E4837BF414A54B069DE0FC14755B9</Ref>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="MeshPart" referent="RBX311E4837BF414A54B069DE0FC14755B9">
+				<Properties>
+					<bool name="Anchored">false</bool>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-40.1294632</X>
+						<Y>6.28137779</Y>
+						<Z>-107.16523</Z>
+						<R00>0</R00>
+						<R01>0</R01>
+						<R02>-1</R02>
+						<R10>-0.039026022</R10>
+						<R11>0.999238491</R11>
+						<R12>0</R12>
+						<R20>0.999238491</R20>
+						<R21>0.0390260033</R21>
+						<R22>0</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<bool name="CastShadow">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<bool name="DoubleSided">false</bool>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<bool name="HasJointOffset">false</bool>
+					<bool name="HasSkinnedMesh">false</bool>
+					<Vector3 name="InitialSize">
+						<X>0.257335067</X>
+						<Y>0.477802485</Y>
+						<Z>2.81592393</Z>
+					</Vector3>
+					<Vector3 name="JointOffset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<BinaryString name="LODData"></BinaryString>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">1088</token>
+					<Content name="MeshID"><url>rbxassetid://2492972666</url></Content>
+					<Content name="MeshId"><url>rbxassetid://2492972666</url></Content>
+					<string name="Name">Pump</string>
+					<SharedString name="PhysicalConfigData">O7ho3fdTI22WGpgFzVOMTA==</SharedString>
+					<BinaryString name="PhysicsData"></BinaryString>
+					<float name="Reflectance">0</float>
+					<token name="RenderFidelity">1</token>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">-127</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="TextureID"><url>rbxassetid://2492974637</url></Content>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>0.171542764</X>
+						<Y>0.318509072</Y>
+						<Z>1.87712991</Z>
+					</Vector3>
+				</Properties>
+			</Item>
+			<Item class="MeshPart" referent="RBXB639FF5194AA4B2AB6897019EFEFDC58">
+				<Properties>
+					<bool name="Anchored">false</bool>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>-39.6278343</X>
+						<Y>6.06890869</Y>
+						<Z>-107.127205</Z>
+						<R00>0</R00>
+						<R01>0</R01>
+						<R02>-1</R02>
+						<R10>-0.0390260071</R10>
+						<R11>0.999238253</R11>
+						<R12>0</R12>
+						<R20>0.999238253</R20>
+						<R21>0.0390260033</R21>
+						<R22>0</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<bool name="CastShadow">true</bool>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<bool name="DoubleSided">false</bool>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<bool name="HasJointOffset">false</bool>
+					<bool name="HasSkinnedMesh">false</bool>
+					<Vector3 name="InitialSize">
+						<X>0.456916362</X>
+						<Y>1.49975502</Y>
+						<Z>7.30256557</Z>
+					</Vector3>
+					<Vector3 name="JointOffset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<BinaryString name="LODData"></BinaryString>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">1088</token>
+					<Content name="MeshID"><url>rbxassetid://2492972199</url></Content>
+					<Content name="MeshId"><url>rbxassetid://2492972199</url></Content>
+					<string name="Name">Shotgun</string>
+					<SharedString name="PhysicalConfigData">+qv2o0HSW+htH+ALwYQpiw==</SharedString>
+					<BinaryString name="PhysicsData"></BinaryString>
+					<float name="Reflectance">0</float>
+					<token name="RenderFidelity">1</token>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">-127</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="TextureID"><url>rbxassetid://2492974190</url></Content>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>0.304586142</X>
+						<Y>0.999755383</Y>
+						<Z>4.86798096</Z>
+					</Vector3>
+				</Properties>
+			</Item>
+			<Item class="Folder" referent="RBX3F017830A2494B1FA44A73E996AA6CF3">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Remotes</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="RemoteFunction" referent="RBXCDEACFA5C8194F9EAA1666A15FE5D726">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">MouseEvent</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="RemoteFunction" referent="RBXD4D5A1ABFB9B4351AEDC1A8C49B94846">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">ChangeStatus</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="RemoteEvent" referent="RBX6AFE3AB920504685945C468FB2C0A646">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">DamageDealt</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="RemoteFunction" referent="RBX9F2CA0E282CE4EA0A5FFEC222A8C1354">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">ChangeFireMode</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Folder" referent="RBX3240E4ACAA9F48E681BC651617B6A059">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Sounds</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="Sound" referent="RBX544853DE31414462A5F111B503AD2F28">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Equip</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://3834495137</url></Content>
+						<int64 name="SourceAssetId">3834495137</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">5</float>
+						<float name="xmlRead_MaxDistance_3">30</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX90D5798A87F943FC931119D1B5ABD664">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Hit</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://1489924400</url></Content>
+						<int64 name="SourceAssetId">144884872</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">1</float>
+						<float name="xmlRead_MaxDistance_3">10000</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX1F68D64570324A14BB3DD3B385073561">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Jam</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://4980132174</url></Content>
+						<int64 name="SourceAssetId">4980132174</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">3</float>
+						<float name="xmlRead_MaxDistance_3">10000</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX32443B4BCF574698A22716D0FDCF0AFB">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Reload</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://199939411</url></Content>
+						<int64 name="SourceAssetId">199939411</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">0.5</float>
+						<float name="xmlRead_MaxDistance_3">30</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX1A3F14BE02A24D94B1A4C46FE02E6896">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Shoot</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://4502821590</url></Content>
+						<int64 name="SourceAssetId">4502821590</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">0.300000012</float>
+						<float name="xmlRead_MaxDistance_3">30</float>
+					</Properties>
+				</Item>
+				<Item class="Sound" referent="RBX911E178F1CE24475A3AF3E766E7E2D43">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="EmitterSize">10</float>
+						<bool name="Looped">false</bool>
+						<string name="Name">Unequip</string>
+						<bool name="PlayOnRemove">false</bool>
+						<float name="PlaybackSpeed">1</float>
+						<bool name="Playing">false</bool>
+						<token name="RollOffMode">0</token>
+						<Ref name="SoundGroup">null</Ref>
+						<Content name="SoundId"><url>rbxassetid://3834495137</url></Content>
+						<int64 name="SourceAssetId">3834495137</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<double name="TimePosition">0</double>
+						<float name="Volume">5</float>
+						<float name="xmlRead_MaxDistance_3">30</float>
+					</Properties>
+					<Item class="PitchShiftSoundEffect" referent="RBX61A35016115E4698BF3EC7DB88629B88">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<bool name="Enabled">true</bool>
+							<string name="Name">PitchShiftSoundEffect</string>
+							<float name="Octave">0.899999976</float>
+							<int name="Priority">0</int>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+				</Item>
+			</Item>
+			<Item class="Folder" referent="RBX7D7BEB8C9BC94E669D55470905A3F565">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Values</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="IntValue" referent="RBX313F0EAD4BE84DB7B597F27EFD0C4552">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Ammo</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<int64 name="Value">0</int64>
+					</Properties>
+				</Item>
+				<Item class="StringValue" referent="RBX436198CBA9484B988D5F905B04442E04">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">FireMode</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Value">semi</string>
+					</Properties>
+				</Item>
 			</Item>
 		</Item>
 	</Item>
@@ -20003,6 +21236,378 @@ return module]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
+			<Item class="ModuleScript" referent="RBXC3017038C3EC4C619F43BB3B836EAC70">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Shotgun</string>
+					<string name="ScriptGuid">{E6313CB2-8206-4D25-9B6D-8B786D8770F8}</string>
+					<ProtectedString name="Source"><![CDATA[local module = {}
+module.__index = module
+
+-- // VARIABLES \\ --
+
+local RNG = Random.new()
+local TAU = math.pi * 2	
+
+local Debris = game:GetService("Debris")
+
+local Settings = require(game.ReplicatedStorage.Settings[script.Name])
+local FastCast = require(script.Parent.FastCastRedux)
+local Table = require(script.Parent.FastCastRedux.Table)
+local PartCacheModule = require(script.Parent.PartCache)
+
+local Core = require(game.ServerScriptService.Core)
+local newThread = Core("newThread")
+local playSound = Core("playSound")
+
+local cosmeticBulletsFolder = workspace:FindFirstChild("CosmeticBulletsFolder") or Instance.new("Folder", workspace)
+cosmeticBulletsFolder.Name = "CosmeticBulletsFolder"
+
+-- // FUNCTIONS \\ --
+
+-- effects
+
+function module:playSmoke()
+	local newSmoke = self.VFX.smoke:Clone()
+	newSmoke.Enabled = true
+	newSmoke.Parent = self.tool.handle
+	Debris:AddItem(newSmoke, Settings.smokeDespawnDelay)
+
+	wait(Settings.smokeDuration)
+	newSmoke.Enabled = false
+end
+
+function module:playMuzzleLight()
+	local newMuzzleLight = self.VFX.muzzleLight:Clone()
+	newMuzzleLight.Enabled = true
+	newMuzzleLight.Parent = self.tool.handle
+	Debris:AddItem(newMuzzleLight, Settings.muzzleFlashTime)
+end
+
+function module:playMuzzleFlash()
+	local newMuzzleFlash = self.VFX.muzzleFlash:Clone()
+	newMuzzleFlash.Enabled = true
+	newMuzzleFlash.Parent = self.tool.handle
+	Debris:AddItem(newMuzzleFlash, Settings.muzzleFlashTime)
+end
+
+function module:playHitFX(part, position, normal)
+	local attachment = Instance.new("Attachment")
+	attachment.CFrame = CFrame.new(position, position + normal)
+	attachment.Parent = workspace.Terrain
+
+	local particle = self.VFX.impactParticle:Clone()
+	particle.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, part.Color),
+		ColorSequenceKeypoint.new(0.5, part.Color),
+		ColorSequenceKeypoint.new(1, part.Color)
+	})
+	
+	particle.Parent = attachment
+	Debris:AddItem(attachment, particle.Lifetime.Max)
+
+	particle.Enabled = true
+	wait(Settings.impactParticleDuration)
+	particle.Enabled = false
+end
+
+-- indirect
+
+function module:getCharFromHitPart(part)
+	local currentInstance = part
+	repeat
+		if currentInstance:FindFirstChildWhichIsA("Humanoid") then
+			return currentInstance
+		else
+			currentInstance = currentInstance.Parent
+		end
+	until currentInstance:IsA("Workspace")
+end
+
+function module:fire(direction, sender)	
+	-- random angles
+	local directionalCF = CFrame.new(Vector3.new(), direction)
+	local direction = (directionalCF * CFrame.fromOrientation(0, 0, RNG:NextNumber(0, TAU)) * CFrame.fromOrientation(math.rad(RNG:NextNumber(Settings.minBulletSpreadAngle, Settings.maxBulletSpreadAngle)), 0, 0)).LookVector
+
+	-- realistic bullet velocity
+	local root = self.tool.tool.Parent:WaitForChild("HumanoidRootPart", 1)
+	local myMovementSpeed = root.Velocity
+	local modifiedBulletSpeed = (direction * Settings.bulletSpeed) + myMovementSpeed
+
+	-- fire bullet
+	self.tool.ammo.Value -= Settings.bulletsPerShot
+	self.fastCast.caster:Fire(self.tool.firePointObj.WorldPosition, direction, modifiedBulletSpeed, self.fastCast.castBehavior, sender)
+	
+	newThread(playSound, self.sounds.shootSound, self.tool.handle)
+	
+	newThread(function()
+		self:playMuzzleFlash()
+	end)
+	
+	newThread(function()
+		self:playMuzzleLight()
+	end)
+	
+	newThread(function()
+		self:playSmoke()
+	end)	
+end
+
+-- events
+
+function module:onRayHit(cast, raycastResult, segmentVelocity, cosmeticBulletObject, sender)
+	local hitPart = raycastResult.Instance
+	local hitPoint = raycastResult.Position
+	local normal = raycastResult.Normal
+
+	-- check if hit
+	if hitPart then
+		local char = self:getCharFromHitPart(hitPart) or hitPart.Parent:FindFirstChildWhichIsA("Humanoid") and hitPart.Parent
+		if char then
+			local hum = char:FindFirstChildWhichIsA("Humanoid")
+			if hum then
+				local damageType, amount
+				if table.find({"Head"}, hitPart.Name) then
+					damageType = "head"
+					amount = Settings.headDamage
+					hum:TakeDamage(amount)
+				elseif table.find({"UpperTorso", "LowerTorso", "HumanoidRootPart"}, hitPart.Name) then
+					damageType = "torso"
+					amount = Settings.torsoDamage
+					hum:TakeDamage(amount)
+				else
+					damageType = "limb"
+					amount = Settings.limbDamage
+					hum:TakeDamage(amount)
+				end
+				self.tool.remotes.DamageDealt:FireClient(sender, hitPart.Parent, damageType, amount)
+			end
+		end
+		self:playHitFX(hitPart, hitPoint, normal)
+	end
+end
+
+function module:onRayUpdated(cast, segmentOrigin, segmentDirection, length, segmentVelocity, cosmeticBulletObject)
+	if not cosmeticBulletObject then 
+		return 
+	end
+
+	-- adjust bullet size
+	local bulletVelocity = (math.abs(segmentVelocity.X) + math.abs(segmentVelocity.Y) + math.abs(segmentVelocity.Z))
+	cosmeticBulletObject.Size = Vector3.new(cosmeticBulletObject.Size.X, cosmeticBulletObject.Size.Y, bulletVelocity / Settings.bulletLengthMultiplier)
+
+	-- adjust bullet pos
+	local bulletLength = cosmeticBulletObject.Size.Z / 2
+	local baseCFrame = CFrame.new(segmentOrigin, segmentOrigin + segmentDirection)
+	cosmeticBulletObject.CFrame = baseCFrame * CFrame.new(0, 0, -(length - bulletLength))
+end
+
+function module:onRayTerminated(cast)
+	local cosmeticBullet = cast.RayInfo.CosmeticBulletObject
+	if cosmeticBullet then
+		if self.fastCast.castBehavior.CosmeticBulletProvider then
+			self.fastCast.castBehavior.CosmeticBulletProvider:ReturnPart(cosmeticBullet)
+		else
+			cosmeticBullet:Destroy()
+		end
+	end
+end
+
+function module:onMouseEventFired(p, mousePoint)
+
+	-- debounce	
+	if not self.temp.canFire or os.clock() - self.temp.timeOfRecentFire < 60 / Settings.fireRate then
+		playSound(self.sounds.jamSound, self.tool.handle)
+		return false, "GUN_JAMMED"
+	end
+	self.temp.timeOfRecentFire = os.clock()
+	self.temp.canFire = false	
+
+	-- check ammo
+	if self.tool.ammo.Value <= 0 then
+		self.temp.canFire = true
+		playSound(self.sounds.jamSound, self.tool.handle)
+		return false, "NO_AMMO"
+	end
+
+	-- check if gun is equipped
+	if self.tool.tool.Parent:IsA("Backpack") then 
+		self.temp.canFire = true
+		return false, "TOOL_NOT_EQUIPPED"
+	end	
+
+	-- fire gun
+	local mouseDirection = (mousePoint - self.tool.firePointObj.WorldPosition).Unit
+
+	local bulletsToShoot
+	if self.tool.fireMode.Value == "burst" then
+		bulletsToShoot = self.tool.ammo.Value >= Settings.burstBulletsPerShot and Settings.burstBulletsPerShot or self.tool.ammo.Value
+	else
+		bulletsToShoot = 1
+	end
+
+	for i = 1, bulletsToShoot do
+		self:fire(mouseDirection, p)
+
+		if self.tool.fireMode.Value == "burst" then
+			wait(Settings.burstShoootDelay)
+		end	
+	end
+
+	-- end debounce
+	self.temp.canFire = true
+	return true, "FIRED"
+end
+
+function module:onChangeStatusFired(p, status)
+	if status == "reload" then
+		self.temp.canFire = false
+		self.sounds.reloadSound:Play()
+		wait(Settings.reloadTime)
+		self.tool.ammo.Value = Settings.maxAmmo
+		self.temp.canFire = true
+		return true, "GUN_RELOADED"
+	elseif status == "equip" then
+		self.temp.canFire = true
+		self.fastCast.castParams.FilterDescendantsInstances = {self.tool.tool.Parent, self.fastCast.cosmeticBulletsFolder}
+		self.sounds.equipSound:Play()
+		return true, "GUN_EQUIPPED"
+	elseif status == "unequip" then
+		self.temp.canFire = false
+		self.sounds.unequipSound:Play()
+		return true, "GUN_UNEQUIPPED"
+	end
+end
+
+function module:onChangeFireMode(p)
+	local fireModes = Settings.fireMode
+	local oldFireModeIndex = table.find(fireModes, self.tool.fireMode.Value)
+	local newFireMode
+
+	if oldFireModeIndex == #fireModes and oldFireModeIndex ~= 1 then
+		newFireMode = fireModes[1]
+	elseif oldFireModeIndex < #fireModes then
+		newFireMode = fireModes[oldFireModeIndex + 1]
+	end
+	if newFireMode then
+		self.tool.fireMode.Value = newFireMode
+		return newFireMode
+	end
+end
+
+-- // INIT \\ --
+
+function module.init(tool)
+	
+	-- create dictionary
+	
+	local self = {}
+	self = {
+		tool = {
+			tool = tool,
+			handle = tool.Handle,
+			firePointObj = tool.Handle.GunFirePoint,
+			remotes = tool.Remotes,
+			values = tool.Values,
+			ammo = tool.Values.Ammo,
+			fireMode = tool.Values.FireMode
+		},
+		sounds = {},
+		VFX = {
+			impactParticle = tool.Handle.ImpactParticle,
+			muzzleFlash = tool.Handle.MuzzleFlash,
+			muzzleLight = tool.Handle.MuzzleLight,
+			smoke = tool.Handle.Smoke
+		},
+		temp = {
+			canFire = true,
+			timeOfRecentFire = os.clock(),	
+		},
+		fastCast = {
+			caster = FastCast.new(),
+			cosmeticBullet = nil,
+			castParams = nil,
+			castBehavior = nil,
+		}
+	}
+	setmetatable(self, module)
+	
+	-- set ammo
+	
+	self.tool.ammo.Value = Settings.maxAmmo
+
+	-- sets sounds
+	for _,sound in pairs(tool.Sounds:GetChildren()) do
+		sound.Parent = self.tool.handle
+		self.sounds[sound.Name:sub(1, 1):lower() .. sound.Name:sub(2, #sound.Name) .. "Sound"] = sound
+	end
+	-- creates bullet
+	
+	self.fastCast.cosmeticBullet = Instance.new("Part")
+	for propertyName, propertyValue in pairs(Settings.bulletProps) do
+		self.fastCast.cosmeticBullet[propertyName] = propertyValue
+	end
+
+	-- new raycast paras
+	
+	self.fastCast.castParams = RaycastParams.new()
+	for propertyName, propertyValue in pairs(Settings.raycastParas) do
+		self.fastCast.castParams[propertyName] = propertyValue
+	end
+
+	-- data packets
+	
+	self.fastCast.castBehavior = FastCast.newBehavior()
+	self.fastCast.castBehavior.RaycastParams = self.fastCast.castParams
+	self.fastCast.castBehavior.MaxDistance = Settings.bulletMaxDist
+
+	-- part cache
+	
+	local cosmeticPartProvider = PartCacheModule.new(self.fastCast.cosmeticBullet, 100, cosmeticBulletsFolder)
+	self.fastCast.castBehavior.CosmeticBulletProvider = cosmeticPartProvider
+	self.fastCast.castBehavior.CosmeticBulletContainer = cosmeticPartProvider
+	self.fastCast.castBehavior.Acceleration = Settings.bulletGravity
+	self.fastCast.castBehavior.AutoIgnoreContainer = false
+	
+	-- events
+	
+	self.fastCast.caster.RayHit:Connect(function(...)
+		self:onRayHit(...)
+	end)
+	
+	self.fastCast.caster.LengthChanged:Connect(function(...)
+		self:onRayUpdated(...)
+	end)
+	
+	self.fastCast.caster.CastTerminating:Connect(function(...)
+		self:onRayTerminated(...)
+	end)
+	
+	self.tool.remotes.MouseEvent.OnServerInvoke = function(...)
+		self:onMouseEventFired(...)
+	end
+	
+	self.tool.remotes.ChangeStatus.OnServerInvoke = function(...)
+		return self:onChangeStatusFired(...)
+	end
+
+	self.tool.remotes.ChangeFireMode.OnServerInvoke = function(...)
+		return self:onChangeFireMode(...)
+	end
+
+end
+
+-- // COMPILE \\ --
+
+FastCast.DebugLogging = Settings.willDebug
+FastCast.VisualizeCasts = Settings.willDebug
+
+return module]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
 		</Item>
 		<Item class="Script" referent="RBXFC63455869C94254BCC13CF6895518D8">
 			<Properties>
@@ -20131,6 +21736,27 @@ collection(NPC_TAG, init)
 							<R>0.489025444</R>
 							<G>0.0175800547</G>
 							<B>0.665098011</B>
+						</Color3>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Folder" referent="RBX8EF780E535474049A72FAFD52047E6FA">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Shotgun</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="Color3Value" referent="RBXDCE477C770C44BC7BBC0DF2021B2998D">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Color</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<Color3 name="Value">
+							<R>0.338467181</R>
+							<G>0.596470594</G>
+							<B>0.239264399</B>
 						</Color3>
 					</Properties>
 				</Item>
@@ -20293,6 +21919,109 @@ return Settings]]></ProtectedString>
 	impactParticleDuration = 0.05,
 	smokeDuration = 3,
 	smokeDespawnDelay = 5,
+	
+	-- UI
+	UI = {
+		DamageIndicator = {
+			head = {
+				TextColor3 = Color3.fromRGB(255, 255, 150),
+				TextStrokeColor3 = Color3.fromRGB(55, 45, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
+			},
+			torso = {
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
+			},
+			limb = {
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+				TextStrokeTransparency = 0.7,
+				TextTransparency = 1
+			},
+			maxduration = 2,
+			tweenInfo = TweenInfo.new(0.5),
+			minOffset = Vector3.new(-6, -6, 0),
+			maxOffset = Vector3.new(6, 6, 0)
+		},
+		GunInfo = {
+			hiddenPos = UDim2.new(1, -420, 1, 0),
+			shownPos = UDim2.new(1, -420, 1, -140),
+			tweenInfo = TweenInfo.new(0.3)
+		},
+		textFlashTweenInfo = TweenInfo.new(0.1)
+	},
+	
+	-- bullet props
+	bulletProps = {
+		Material = Enum.Material.Neon,
+		Color = Color3.fromRGB(255, 123, 123),
+		CanCollide = false,
+		Anchored = true,
+		Size = Vector3.new(0.05, 0.05, 1)
+	},
+	
+	-- raycast paras
+	raycastParas = {
+		IgnoreWater = true,
+		FilterType = Enum.RaycastFilterType.Blacklist,
+		FilterDescendantsInstances = {}
+	},
+	
+	-- keybinds
+	keybinds = {
+		shoot = Enum.UserInputType.MouseButton1,
+		reload = Enum.KeyCode.R,
+		fireMode = Enum.KeyCode.V
+	}
+}
+
+return Settings]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXB822C19460AB46609315EE243E26BC58">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Shotgun</string>
+					<string name="ScriptGuid">{D1E3CFC3-1A80-43AF-BB0A-789A3A6ED5CF}</string>
+					<ProtectedString name="Source"><![CDATA[local Settings = {
+	
+	-- debug
+	willDebug = false,
+	
+	-- gun
+	mouseIcon = "rbxassetid://131581677",
+	fireMode = {"semi", "safety"}, -- array: safety, semi, burst, auto
+	bulletsPerShot = 4,
+	burstBulletsPerShot = 3,
+	burstShoootDelay = 0.1,
+	maxAmmo = 6,
+	reloadTime = 1.5,
+	minBulletSpreadAngle = 0, -- between 0 and 180, in degrees
+	maxBulletSpreadAngle = 0, -- between 0 and 180, in degrees
+	fireRate = 100,
+	
+	-- damage
+	headDamage = 30,
+	torsoDamage = 24,
+	limbDamage = 18,
+	
+	-- bullets
+	bulletSpeed = 1500, -- studs/sec
+	bulletMaxDist = 130, -- studs
+	bulletGravity = Vector3.new(0, -workspace.Gravity, 0),
+	bulletLengthMultiplier = 200,
+	
+	-- effects
+	muzzleFlashTime = 0.2,
+	impactParticleDuration = 0.05,
+	smokeDuration = 4,
+	smokeDespawnDelay = 6,
 	
 	-- UI
 	UI = {
@@ -21827,6 +23556,30 @@ AAAACQAAAAkAAAATAAAAFAAAAAkAAAAUAAAAFQAAAAkAAAAVAAAAFgAAAAoAAAAWAAAAFwAA
 AAoAAAAXAAAACwAAAAsAAAAXAAAAGAAAAAsAAAAYAAAADAAAAAwAAAAYAAAAGQAAAAwAAAAZ
 AAAADQAAAA0AAAAZAAAAGgAAAA0AAAAaAAAADgAAAA4AAAAaAAAAGwAAAA4AAAAbAAAADwAA
 ABAAAAASAAAAEQAAABAAAAAbAAAAGgAAABYAAAAYAAAAFwAAAA==</SharedString>
+		<SharedString md5="O7ho3fdTI22WGpgFzVOMTA==">Q1NHUEhTBgAAAPQQpT2i16i7RGJbveHrFD/3whg9WC2hOLVMNLoaehY9YoNYO3zzlDoQAAAA
+AAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIA/GAAAAAQAAADcoM69YNgvPVYI
+Tb/coM69mgAwPRk4tL/49V49YNgvPVYITb/coM69UEwQPlYITb/coM69UEwQPhk4tL8OiJK9
+iKJ0Phk4tL/49V49eph0PlYITb8OiJK9eph0PlYITb8kAAAAAAAAAAEAAAACAAAAAAAAAAIA
+AAAGAAAAAAAAAAYAAAAHAAAAAAAAAAcAAAADAAAAAAAAAAMAAAAEAAAAAAAAAAQAAAABAAAA
+AQAAAAQAAAAFAAAAAQAAAAUAAAACAAAAAgAAAAUAAAAGAAAAAwAAAAcAAAAFAAAAAwAAAAUA
+AAAEAAAABQAAAAcAAAAGAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA
+AACAP04AAAAEAAAAAAAAAIaidL6i160/tEi6PZEnSb6i160/Xn2GPaxKJb4YOLQ/AAAAAO6s
+RL4YOLQ/Xn2GvaxKJb4YOLQ/tEi6vZEnSb6i160/tEi6vZEnSb5omm8+AAAAALmadL5omm8+
+tEi6PZEnSb5omm8+bMEDPmhfwL2i160/ZjS+PRkms70YOLQ/ZjS+vRkms70YOLQ/bMEDvmhf
+wL2i160/bMEDvmhfwL1omm8+zc2/vWhfwL3o9Dw+6Z+HvSKLLL7o9Dw+AAAAAJgzTL7o9Dw+
+bMEDPmhfwL1omm8+6Z+HPSKLLL7o9Dw+zc2/PWhfwL3o9Dw+QTKaPaxJhT1omm8+QTKaPRI6
+hT0YOLQ/QTKavRI6hT0YOLQ/QTKavaxJhT1omm8+QTKavaxJhT3o9Dw+QTKaPaxJhT3o9Dw+
+kAAAAAAAAAABAAAAAgAAAAAAAAACAAAAAwAAAAAAAAADAAAABAAAAAAAAAAEAAAABQAAAAAA
+AAAFAAAABgAAAAAAAAAGAAAABwAAAAAAAAAHAAAACAAAAAAAAAAIAAAAAQAAAAEAAAAJAAAA
+CgAAAAEAAAAKAAAAAgAAAAEAAAAIAAAAEQAAAAEAAAARAAAACQAAAAIAAAAKAAAAFQAAAAIA
+AAAVAAAAFgAAAAIAAAAWAAAACwAAAAIAAAALAAAABAAAAAIAAAAEAAAAAwAAAAQAAAALAAAA
+BQAAAAUAAAALAAAADAAAAAUAAAAMAAAADQAAAAUAAAANAAAABgAAAAYAAAANAAAADgAAAAYA
+AAAOAAAADwAAAAYAAAAPAAAAEAAAAAYAAAAQAAAABwAAAAcAAAAQAAAACAAAAAgAAAAQAAAA
+EgAAAAgAAAASAAAAEwAAAAgAAAATAAAAEQAAAAkAAAARAAAAGQAAAAkAAAAZAAAAFAAAAAkA
+AAAUAAAAFQAAAAkAAAAVAAAACgAAAAsAAAAWAAAADAAAAAwAAAAWAAAAFwAAAAwAAAAXAAAA
+GAAAAAwAAAAYAAAADQAAAA0AAAAYAAAADgAAAA4AAAAYAAAAGQAAAA4AAAAZAAAAEwAAAA4A
+AAATAAAAEgAAAA4AAAASAAAAEAAAAA4AAAAQAAAADwAAABEAAAATAAAAGQAAABQAAAAZAAAA
+GAAAABQAAAAYAAAAFwAAABQAAAAXAAAAFgAAABQAAAAWAAAAFQAAAA==</SharedString>
 		<SharedString md5="ZkJox6clMJuzLidoBqImhA==">Q1NHUEhTBwAAAAIvdAQ9OH7Ju6gWS77Sy149LxzoOvdbDbiC7lU4EtGDOgCouTkEY206EAAA
 AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAACAPy0AAAAEAAAAVMmyvbxzjD0u
 /TK+WcCyvdyVLj36W02+WcCyvQBgJjcIKjS+WcCyvQBgJjcu/TK+WcCyvRlmzz0u/TK+WcCy
@@ -22902,5 +24655,6 @@ CwAAAAUAAAALAAAADwAAAAUAAAAPAAAADgAAAAUAAAAOAAAACgAAAAgAAAAKAAAADgAAAAgA
 AAAOAAAADAAAAAkAAAANAAAADwAAAAkAAAAPAAAACwAAAAwAAAAOAAAADwAAAAwAAAAPAAAA
 DQAAAA==</SharedString>
 		<SharedString md5="yuZpQdnvvUBOTYh1jqZ2cA=="></SharedString>
+		<SharedString md5="+qv2o0HSW+htH+ALwYQpiw==">Q1NHUEhTAAAAAEJMT0NL</SharedString>
 	</SharedStrings>
 </roblox>
